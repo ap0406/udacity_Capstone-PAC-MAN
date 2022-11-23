@@ -37,7 +37,7 @@ Renderer::~Renderer() {
   SDL_DestroyWindow(sdl_window);
   SDL_Quit();
 }
-
+/*
 void Renderer::Render(Snake const snake, SDL_Point const &food) {
   SDL_Rect block;
   block.w = screen_width / grid_width;
@@ -74,8 +74,36 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
   // Update Screen
   SDL_RenderPresent(sdl_renderer);
 }
+*/
+void Renderer::Render(Map &map) {
+
+  SDL_Rect rect;
+
+  // Clear screen
+  SDL_SetRenderDrawColor(sdl_renderer, 0x0, 0x0, 0x1E, 0xFF);
+  SDL_RenderClear(sdl_renderer);
+
+  // Render background
+  for (auto const i : map.get_background()){
+    rect = map.sr(i.xy, i.size_factor);
+    SDL_SetRenderDrawColor(sdl_renderer, i.color.r, i.color.g, i.color.b, 0xFF);
+    //std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
+    SDL_RenderFillRect(sdl_renderer, &rect);
+  }
+
+  // Render moving objects
+  for (auto const i : map.get_moving_objects()){
+    rect = map.sr(i.xy, i.size_factor);
+    SDL_SetRenderDrawColor(sdl_renderer, i.color.r, i.color.g, i.color.b, 0xFF);
+    //std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
+    SDL_RenderFillRect(sdl_renderer, &rect);
+  }
+
+  // Update Screen
+  SDL_RenderPresent(sdl_renderer);
+}
 
 void Renderer::UpdateWindowTitle(int score, int fps) {
-  std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
+  std::string title{"Pacman Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }
