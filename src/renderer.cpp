@@ -77,7 +77,7 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
 */
 void Renderer::Render(Map &map) {
 
-  SDL_Rect rect;
+  SDL_Rect rect{0,0,0,0};
 
   // Clear screen
   SDL_SetRenderDrawColor(sdl_renderer, 0x0, 0x0, 0x1E, 0xFF);
@@ -88,15 +88,10 @@ void Renderer::Render(Map &map) {
   for (Pacman_base* i = background; i < background+(grid_height*grid_width); ++i) {
     rect = map.sr(i->xy, i->size_factor);
     SDL_SetRenderDrawColor(sdl_renderer, i->color.r, i->color.g, i->color.b, 0xFF);
-    //std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
-    SDL_RenderFillRect(sdl_renderer, &rect);
-  }
-
-  // Render moving objects
-  for (auto const i : map.get_moving_objects()){
-    rect = map.sr(i.xy, i.size_factor);
-    SDL_SetRenderDrawColor(sdl_renderer, i.color.r, i.color.g, i.color.b, 0xFF);
-    //std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
+    // if ( i->name == NAME_T::PACMAN ) {
+    //   std::cout << "background: " << i->xy.x << " " << i->xy.y << " " << i->name << std::endl;
+    //   std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
+    // }
     SDL_RenderFillRect(sdl_renderer, &rect);
   }
 

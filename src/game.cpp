@@ -20,7 +20,7 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
   bool running = true;
 
   InitGame(map);
-
+  
   SetMovingObjects(map);
 
   while (running) {
@@ -31,6 +31,7 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
     controller.HandleInput(running, pacman);
     
     Update(map);
+
     //renderer.Render(snake, food);
     renderer.Render(map); 
 
@@ -55,44 +56,60 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
       SDL_Delay(target_frame_duration - frame_duration);
     }
   }
+
 }
 void Game::PlaceFood(Map &map) {   
     for(int i = 0; i < Map::kGridHeight; ++i) {
         for(int j = 0; j < Map::kGridWidth; ++j) {
-            SDL_Point xy = {j, i};
-            if(map.is_map_open(xy) && !(pacman.is_same_cell(xy) || ghost[0].is_same_cell(xy) || ghost[1].is_same_cell(xy) || ghost[2].is_same_cell(xy) || ghost[3].is_same_cell(xy) || super_food[0].is_same_cell(xy) || super_food[1].is_same_cell(xy) || super_food[2].is_same_cell(xy) || super_food[3].is_same_cell(xy))) 
+            int x_scale = j * map.get_grid_width_size();
+            int y_scale = i * map.get_grid_height_size();
+            SDL_Point xy = {x_scale, y_scale};
+            //if(map.is_map_open(xy) && !(pacman.is_same_cell(xy) || ghost[0].is_same_cell(xy) || ghost[1].is_same_cell(xy) || ghost[2].is_same_cell(xy) || ghost[3].is_same_cell(xy) || super_food[0].is_same_cell(xy) || super_food[1].is_same_cell(xy) || super_food[2].is_same_cell(xy) || super_food[3].is_same_cell(xy))) 
+            if(map.is_map_open(xy))
             {
-
-                //std::cout << "food[x] " << j << " food[y] "<< i << std::endl;
+                //std::cout << "food[x] " << xy.x << " food[y] "<< xy.y << std::endl;
                 food.emplace_back(Pacman_base(NAME_T::FOOD, 0.0, 0.25, xy, ALIVE_T::LIVE, Pacman_base::white));
             }
         }
     }
 }
 void Game::PlaceSuperFood(Map &map) {
-    int placed{0};
-    while (true) {
-      SDL_Point xy{random_w(engine), random_h(engine)};
-      // Check that the location is not occupied by oridinary food or pacman item before placing
-      // Super food.
-      if(map.is_map_open(xy) && !(pacman.is_same_cell(xy) || ghost[0].is_same_cell(xy) || ghost[1].is_same_cell(xy) || ghost[2].is_same_cell(xy) || ghost[3].is_same_cell(xy))) 
-      {
-        //Pacman_base pb (0.0, 0.5, xy, ALIVE_T::DEAD, Pacman_base::white);
-        //std::cout << "super food[x] " << xy.x << " super_food[y] "<< xy.y << std::endl;
-        super_food[placed] = Pacman_base(NAME_T::SUPERFOOD, 0.0, 0.5, xy, ALIVE_T::LIVE, Pacman_base::white);
-        
-        ++placed;
-        if (placed == 4) 
-          return;
-      }
+    // SDL_Point* sfp = map.get_super_food_point();
+    // std::cout << sfp << std::endl;
+    // int placed{0};
+    for (int i = 0; i < 4; ++i)
+    {
+      SDL_Point xy = map.get_super_food_point(i);
+      //  std::cout << i << std::endl;
+       //std::cout << "super food[x] " << xy.x << " super_food[y] "<< xy.y << std::endl;
+       super_food[i] = Pacman_base(NAME_T::SUPERFOOD, 0.0, 0.5, xy, ALIVE_T::LIVE, Pacman_base::white);
+      //  ++placed;
     }
+    // while (true) {
+    //   int x_scale = random_w(engine) * map.get_grid_width_size();
+    //   int y_scale = random_h(engine) * map.get_grid_height_size();
+    //   SDL_Point xy{x_scale, y_scale};
+    //   // Check that the location is not occupied by oridinary food or pacman item before placing
+    //   // Super food.
+    //   //if(map.is_map_open(xy) && !(pacman.is_same_cell(xy) || ghost[0].is_same_cell(xy) || ghost[1].is_same_cell(xy) || ghost[2].is_same_cell(xy) || ghost[3].is_same_cell(xy))) 
+    //   if(map.is_map_open(xy))
+    //   {
+    //     //Pacman_base pb (0.0, 0.5, xy, ALIVE_T::DEAD, Pacman_base::white);
+    //     std::cout << "super food[x] " << xy.x << " super_food[y] "<< xy.y << std::endl;
+    //     super_food[placed] = Pacman_base(NAME_T::SUPERFOOD, 0.0, 0.5, xy, ALIVE_T::LIVE, Pacman_base::white);
+        
+    //     ++placed;
+    //     if (placed == 4) 
+    //       return;
+    //   }
+    // }
 }
 
 void Game::InitGame(Map &map) {
-    pacman = Pacman_base(NAME_T::PACMAN, 0.01, 0.75, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
+    pacman = Pacman_base(NAME_T::PACMAN, 0.75, 0.75, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
 
     ghost[0] = Pacman_base(NAME_T::GHOST, 1.0, 0.75, map.get_ghost_start_point(0,-1), ALIVE_T::LIVE, Pacman_base::red);
-    ghost[1] = Pacman_base(NAME_T::GHOST, 0.9, 0.75, map.get_ghost_start_point(), ALIVE_T::LIVE, Pacman_base::cyan);
+    ghost[1] = Pacman_base(NAME_T::GHOST, 0.9, 0.75, map.get_ghost_start_point(0,0), ALIVE_T::LIVE, Pacman_base::cyan);
     ghost[2] = Pacman_base(NAME_T::GHOST, 0.75, 0.75, map.get_ghost_start_point(1,0), ALIVE_T::LIVE, Pacman_base::orange);
     ghost[3] = Pacman_base(NAME_T::GHOST, 0.5, 0.75, map.get_ghost_start_point(-1,0), ALIVE_T::LIVE, Pacman_base::pink);
 
@@ -104,6 +121,7 @@ void Game::InitGame(Map &map) {
 void Game::SetMovingObjects(Map &map) {
 
     for (auto const i : food) {
+      //std::cout << i.xy.x << " " << i.xy.y << std::endl;
       map.set_moving_object(i);
     }
 
@@ -137,8 +155,6 @@ void Game::ClearMovingObjects(Map &map) {
 
 void Game::Update(Map &map) {
 
-  //ClearMovingObjects(map);
-
   //update pacman to new location
   pacman.update(map);
 
@@ -152,35 +168,16 @@ void Game::Update(Map &map) {
   //set pacman to new location
   map.set_moving_object(pacman);
 
-  ghost[0].update_rand(map, random_dir(engine));
-  //clear ghost from old location
-  map.clear_moving_object(ghost[0].prev_xy);
-  //set ghost to new location
-  map.set_moving_object(ghost[0]);
+  // ghost[0].update_rand(map, random_dir(engine));
+  // //clear ghost from old location
+  // map.clear_moving_object(ghost[0].prev_xy);
+  // //set ghost to new location
+  // map.set_moving_object(ghost[0]);
   
   
-  ghost[1].update_rand(map, random_dir(engine));
-  ghost[2].update_rand(map, random_dir(engine));
-  ghost[3].update_rand(map, random_dir(engine));
-
-  //UpdateMovingObjects(map);
-  /*
-  if (!snake.alive) return;
-
-  snake.Update();
-
-  int new_x = static_cast<int>(snake.head_x);
-  int new_y = static_cast<int>(snake.head_y);
-
-  // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
-    score++;
-    PlaceFood();
-    // Grow snake and increase speed.
-    snake.GrowBody();
-    snake.speed += 0.02;
-  }
-  */
+  // ghost[1].update_rand(map, random_dir(engine));
+  // ghost[2].update_rand(map, random_dir(engine));
+  // ghost[3].update_rand(map, random_dir(engine));
   
 }
 

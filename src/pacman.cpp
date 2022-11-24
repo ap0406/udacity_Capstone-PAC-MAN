@@ -49,25 +49,25 @@ void Pacman_base::update(Map &map) {
     prev_xy = xy;
     switch (direction) {
         case Direction::kUp:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y-1})||map.is_map_nouse(SDL_Point{xy.x, xy.y-1}))
+            if(map.is_map_open(SDL_Point{xy.x, xy.y-1}))
             {
                 xy.y = xy.y - 1;
             }
             break;
         case Direction::kDown:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y+1})||map.is_map_nouse(SDL_Point{xy.x, xy.y+1}))
+            if(map.is_map_open(SDL_Point{xy.x, xy.y+1}))
             {
                 xy.y = xy.y + 1;
             }
             break;
         case Direction::kLeft:
-            if(map.is_map_open(SDL_Point{xy.x-1, xy.y})||map.is_map_nouse(SDL_Point{xy.x-1, xy.y}))
+            if(map.is_map_open(SDL_Point{xy.x-1, xy.y}))
             {
                 xy.x = xy.x - 1;
             }
             break;
         case Direction::kRight:
-            if(map.is_map_open(SDL_Point{xy.x+1, xy.y})||map.is_map_nouse(SDL_Point{xy.x+1, xy.y}))
+            if(map.is_map_open(SDL_Point{xy.x+1, xy.y}))
             {
                 xy.x = xy.x + 1;
             }
@@ -79,25 +79,25 @@ void Pacman_base::update_rand(Map &map, int pos) {
     prev_xy = xy;
     switch (pos) {
         case Direction::kUp:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y-1})||map.is_map_nouse(SDL_Point{xy.x, xy.y-1}))
+            if(map.is_map_open(SDL_Point{xy.x, xy.y-1}))
             {
                 xy.y = xy.y - 1;
             }
             break;
         case Direction::kDown:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y+1})||map.is_map_nouse(SDL_Point{xy.x, xy.y+1}))
+            if(map.is_map_open(SDL_Point{xy.x, xy.y+1}))
             {
                 xy.y = xy.y + 1;
             }
             break;
         case Direction::kLeft:
-            if(map.is_map_open(SDL_Point{xy.x-1, xy.y})||map.is_map_nouse(SDL_Point{xy.x-1, xy.y}))
+            if(map.is_map_open(SDL_Point{xy.x-1, xy.y}))
             {
                 xy.x = xy.x - 1;
             }
             break;
         case Direction::kRight:
-            if(map.is_map_open(SDL_Point{xy.x+1, xy.y})||map.is_map_nouse(SDL_Point{xy.x+1, xy.y}))
+            if(map.is_map_open(SDL_Point{xy.x+1, xy.y}))
             {
                 xy.x = xy.x + 1;
             }
