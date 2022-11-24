@@ -84,9 +84,10 @@ void Renderer::Render(Map &map) {
   SDL_RenderClear(sdl_renderer);
 
   // Render background
-  for (auto const i : map.get_background()){
-    rect = map.sr(i.xy, i.size_factor);
-    SDL_SetRenderDrawColor(sdl_renderer, i.color.r, i.color.g, i.color.b, 0xFF);
+  Pacman_base *background = map.get_background();
+  for (Pacman_base* i = background; i < background+(grid_height*grid_width); ++i) {
+    rect = map.sr(i->xy, i->size_factor);
+    SDL_SetRenderDrawColor(sdl_renderer, i->color.r, i->color.g, i->color.b, 0xFF);
     //std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
     SDL_RenderFillRect(sdl_renderer, &rect);
   }

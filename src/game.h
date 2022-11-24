@@ -31,13 +31,16 @@ class Game {
   std::mt19937 engine;
   std::uniform_int_distribution<int> random_w;
   std::uniform_int_distribution<int> random_h;
+  std::uniform_int_distribution<int> random_dir;
 
   int score{0};
 
   void PlaceSuperFood(Map &map);
   void PlaceFood(Map &map);
   void InitGame(Map &map);
-  void Update();
+  void Update(Map &map);
+  void SetMovingObjects(Map &map);
+  void ClearMovingObjects(Map &map);
 };
 
 #endif

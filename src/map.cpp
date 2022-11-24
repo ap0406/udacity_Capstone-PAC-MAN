@@ -2,7 +2,11 @@
 #include <iostream>
 #include "SDL.h"
 
-GRID_T Map::static_background[kGridHeight][kGridWidth] = 
+Map::Map() {
+    conv_background_to_objects();
+}
+
+GRID_T Map::blueprint[kGridHeight][kGridWidth] = 
     {
         { GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block },
         { GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block },
@@ -33,37 +37,18 @@ SDL_Rect Map::sr(SDL_Point xy, float size_factor) {
     r.h = int(1 * get_grid_height_size() * size_factor);
     return r;
 }
-bool Map::is_map_open(SDL_Point xy) {
-    if ( static_background[xy.y][xy.x] == GRID_T::open ) 
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
+
 void Map::conv_background_to_objects() {
     
     for(int i = 0; i < kGridHeight; ++i) {
         for(int j = 0; j < kGridWidth; ++j) {
-            Pacman_base pb;
-            pb.xy.x = j;
-            pb.xy.y = i;
-            pb.mode = ALIVE_T::DEAD;
-            if ( static_background[i][j] == GRID_T::block ) {
-                pb.color = Pacman_base::blue;
+            backobj = Pacman_base(NAME_T::BACKGROUND, 0.0, 1.0, SDL_Point{j,i}, ALIVE_T::DEAD, Pacman_base::black);
+            background[i][j] = backobj;
+            if ( blueprint[i][j] == GRID_T::block ) {
+                //pb.color = Pacman_base::blue;
+                background[i][j].color = Pacman_base::blue;
             }
-            else {
-                pb.color = Pacman_base::black;
-            }
-            background.emplace_back(pb);
+            
         }
     }
-}
-void Map::clear_moving_object() {
-    moving_objects.clear();
-}
-void Map::set_moving_object(Pacman_base pb) {
-    moving_objects.emplace_back(pb);
 }

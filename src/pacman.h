@@ -6,6 +6,11 @@
 
 struct RGB_T { uint8_t r,g,b; };
 enum ALIVE_T { LIVE, DEAD };
+enum Direction { kUp, kDown, kLeft, kRight, noChange };
+enum NAME_T { FOOD, SUPERFOOD, PACMAN, GHOST, BACKGROUND, BLOCK };
+
+//forward declaration
+class Map;
 
 class Pacman_base {
     public:
@@ -22,11 +27,17 @@ class Pacman_base {
 
         float speed_factor;
         float size_factor;
-        SDL_Point xy; 
+        SDL_Point xy;
+        SDL_Point prev_xy; 
         ALIVE_T mode;
         RGB_T color;
+        NAME_T name;
+        Direction direction;
         Pacman_base();
+        Pacman_base(NAME_T name_t, float speed_f, float size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);
         bool is_same_cell(SDL_Point);
+        void update(Map &map);
+        void update_rand(Map &map, int);
 };
 
 #endif
