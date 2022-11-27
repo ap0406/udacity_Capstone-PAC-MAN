@@ -14,16 +14,16 @@ RGB_T Pacman_base::pink {0xcc, 0x00, 0xcc};
 RGB_T Pacman_base::orange {0xcc, 0x66, 0x00};
 
 Pacman_base::Pacman_base() {
-    speed_factor = 0.0;
+    speed_factor = 0;
     xy = SDL_Point{0,0};
     mode = ALIVE_T::DEAD;
     color = Pacman_base::yellow;
     name = NAME_T::BACKGROUND;
-    size_factor = 1.0;
+    size_factor = 1;
     direction = Direction::noChange;
 }
 
-Pacman_base::Pacman_base(NAME_T name_t, float speed_f, float size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t) {
+Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t) {
     name = name_t;
     speed_factor = speed_f;
     xy = ab;
@@ -33,74 +33,80 @@ Pacman_base::Pacman_base(NAME_T name_t, float speed_f, float size_f, SDL_Point a
     size_factor = size_f;
 }
 
-bool Pacman_base::is_same_cell(SDL_Point ab) {
-    if((ab.x == xy.x) && (ab.y == xy.y)) 
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+// bool Pacman_base::is_same_cell(SDL_Point ab) {
+//     if((ab.x == xy.x) && (ab.y == xy.y)) 
+//     {
+//         return true;
+//     }
+//     else
+//     {
+//         return false;
+//     }
     
-}
+// }
 
 void Pacman_base::update(Map &map) {
+    int y_update;
+    int x_update;
     prev_xy = xy;
     switch (direction) {
         case Direction::kUp:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y-1}))
+            y_update = xy.y - int(speed_factor);
+            if(map.is_path(SDL_Point{xy.x, y_update}))
             {
-                xy.y = xy.y - 1;
+                xy.y = y_update;
             }
             break;
         case Direction::kDown:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y+1}))
+            y_update = xy.y + int(speed_factor);
+            if(map.is_path(SDL_Point{xy.x, y_update}))
             {
-                xy.y = xy.y + 1;
+                xy.y = y_update;
             }
             break;
         case Direction::kLeft:
-            if(map.is_map_open(SDL_Point{xy.x-1, xy.y}))
+            x_update = xy.x - int(speed_factor);
+            if(map.is_path(SDL_Point{x_update, xy.y}))
             {
-                xy.x = xy.x - 1;
+                xy.x = x_update;
             }
             break;
         case Direction::kRight:
-            if(map.is_map_open(SDL_Point{xy.x+1, xy.y}))
+            x_update = xy.x + int(speed_factor);
+            if(map.is_path(SDL_Point{x_update, xy.y}))
             {
-                xy.x = xy.x + 1;
+                xy.x = x_update;
             }
             break;
     }
 }
 
-void Pacman_base::update_rand(Map &map, int pos) {
-    prev_xy = xy;
-    switch (pos) {
-        case Direction::kUp:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y-1}))
-            {
-                xy.y = xy.y - 1;
-            }
-            break;
-        case Direction::kDown:
-            if(map.is_map_open(SDL_Point{xy.x, xy.y+1}))
-            {
-                xy.y = xy.y + 1;
-            }
-            break;
-        case Direction::kLeft:
-            if(map.is_map_open(SDL_Point{xy.x-1, xy.y}))
-            {
-                xy.x = xy.x - 1;
-            }
-            break;
-        case Direction::kRight:
-            if(map.is_map_open(SDL_Point{xy.x+1, xy.y}))
-            {
-                xy.x = xy.x + 1;
-            }
-            break;
-    }
-}
+// void Pacman_base::update_rand(Map &map, int pos) {
+//     prev_xy = xy;
+//     switch (pos) {
+//         case Direction::kUp:
+//             if(map.is_map_open(SDL_Point{xy.x, xy.y-1}))
+//             {
+//                 xy.y = xy.y - 1;
+//             }
+//             break;
+//         case Direction::kDown:
+//             if(map.is_map_open(SDL_Point{xy.x, xy.y+1}))
+//             {
+//                 xy.y = xy.y + 1;
+//             }
+//             break;
+//         case Direction::kLeft:
+//             if(map.is_map_open(SDL_Point{xy.x-1, xy.y}))
+//             {
+//                 xy.x = xy.x - 1;
+//             }
+//             break;
+//         case Direction::kRight:
+//             if(map.is_map_open(SDL_Point{xy.x+1, xy.y}))
+//             {
+//                 xy.x = xy.x + 1;
+//             }
+//             break;
+//     }
+// }

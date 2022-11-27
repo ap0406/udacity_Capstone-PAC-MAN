@@ -7,7 +7,7 @@
 struct RGB_T { uint8_t r,g,b; };
 enum ALIVE_T { LIVE, DEAD };
 enum Direction { kUp, kDown, kLeft, kRight, noChange };
-enum NAME_T { FOOD, SUPERFOOD, PACMAN, GHOST, BACKGROUND, BLOCK };
+enum NAME_T { FOOD, SUPERFOOD, PACMAN, GHOST, BACKGROUND };
 
 //forward declaration
 class Map;
@@ -25,8 +25,8 @@ class Pacman_base {
         static RGB_T pink;
         static RGB_T orange;
 
-        float speed_factor;
-        float size_factor;
+        uint8_t speed_factor;
+        uint8_t size_factor;
         SDL_Point xy;
         SDL_Point prev_xy; 
         ALIVE_T mode;
@@ -34,10 +34,10 @@ class Pacman_base {
         NAME_T name;
         Direction direction;
         Pacman_base();
-        Pacman_base(NAME_T name_t, float speed_f, float size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);
-        bool is_same_cell(SDL_Point);
+        Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);
+        // bool is_same_cell(SDL_Point);
         void update(Map &map);
-        void update_rand(Map &map, int);
+        // void update_rand(Map &map, int);
 };
 
 #endif

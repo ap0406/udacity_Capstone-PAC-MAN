@@ -7,10 +7,6 @@
 int main() {
   constexpr std::size_t kFramesPerSecond{60};
   constexpr std::size_t kMsPerFrame{1000 / kFramesPerSecond};
-  // constexpr std::size_t kScreenWidth{640};
-  // constexpr std::size_t kScreenHeight{640};
-  // constexpr std::size_t kGridWidth{32};
-  // constexpr std::size_t kGridHeight{32};
 
   //Renderer renderer(kScreenWidth, kScreenHeight, kGridWidth, kGridHeight);
   //Controller controller;
@@ -18,13 +14,13 @@ int main() {
   //game.Run(controller, renderer, kMsPerFrame);
 
   Map map;
-  Renderer renderer(Map::kScreenWidth, Map::kScreenHeight, Map::kGridWidth, Map::kGridHeight);
+  Renderer renderer(Map::kScreenSize, Map::kScreenSize, Map::kGridSize, Map::kGridSize);
   Game game;
   Controller controller;
   game.Run(map, controller, renderer, kMsPerFrame);
 
   std::cout << "Game has terminated successfully!\n";
-  std::cout << "Score: " << game.GetScore() << "\n";
+  //std::cout << "Score: " << game.GetScore() << "\n";
   //std::cout << "Size: " << game.GetSize() << "\n";
   return 0;
 }

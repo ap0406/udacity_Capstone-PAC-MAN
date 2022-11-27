@@ -35,12 +35,12 @@ class Game {
 
   int score{0};
 
-  void PlaceSuperFood(Map &map);
-  void PlaceFood(Map &map);
+  // void PlaceSuperFood(Map &map);
+  // void PlaceFood(Map &map);
   void InitGame(Map &map);
   void Update(Map &map);
   void SetMovingObjects(Map &map);
-  void ClearMovingObjects(Map &map);
+  // void ClearMovingObjects(Map &map);
 };
 
 #endif

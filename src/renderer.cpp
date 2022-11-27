@@ -77,22 +77,51 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
 */
 void Renderer::Render(Map &map) {
 
-  SDL_Rect rect{0,0,0,0};
-
   // Clear screen
   SDL_SetRenderDrawColor(sdl_renderer, 0x0, 0x0, 0x1E, 0xFF);
   SDL_RenderClear(sdl_renderer);
 
   // Render background
-  Pacman_base *background = map.get_background();
-  for (Pacman_base* i = background; i < background+(grid_height*grid_width); ++i) {
-    rect = map.sr(i->xy, i->size_factor);
-    SDL_SetRenderDrawColor(sdl_renderer, i->color.r, i->color.g, i->color.b, 0xFF);
-    // if ( i->name == NAME_T::PACMAN ) {
-    //   std::cout << "background: " << i->xy.x << " " << i->xy.y << " " << i->name << std::endl;
-    //   std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
-    // }
-    SDL_RenderFillRect(sdl_renderer, &rect);
+  // Pacman_base* background = map.get_background();
+  // Pacman_base* start = background;
+  // Pacman_base* end = start+2; //*sizeof(Pacman_base));
+  for (int i=0; i<grid_height; ++i) {
+      for (int j=0; j<grid_width; ++j) {
+          Pacman_base* pb = map.get_background(i,j);
+          //std::cout << "rendered: " << pb << std::endl;
+          SDL_Rect rect = map.get_sdl_rect(pb);
+          SDL_SetRenderDrawColor(sdl_renderer, pb->color.r, pb->color.g, pb->color.b, 0xFF);
+          // if ( i->name == NAME_T::PACMAN ) {
+          //   std::cout << "background: " << i->xy.x << " " << i->xy.y << " " << i->name << std::endl;
+          //   std::cout << "background: " << rect.x << " " << rect.y << " " << rect.w << " " << rect.h << std::endl;
+          // }
+          SDL_RenderFillRect(sdl_renderer, &rect);
+      }
+  }
+  for (int i = 0; i < int(screen_height); ++i) {
+      for(int j = 0; j < int(screen_width); ++j) {
+          Pacman_base* pb = map.get_moving_objects() + ( i * screen_height ) + j;
+          if(pb->mode == ALIVE_T::LIVE) {
+              SDL_Rect rect = map.get_sdl_rect(pb);
+              SDL_SetRenderDrawColor(sdl_renderer, pb->color.r, pb->color.g, pb->color.b, 0xFF);
+              SDL_RenderFillRect(sdl_renderer, &rect);
+          }
+          //std::cout << "moving objects offset" << addr_offset << std::endl;
+      }
+  }
+
+  for (int i = 0; i < screen_height; ++i)
+  {
+      for (int j = 0; j < screen_height; ++j)
+      {
+          if (map.is_path(SDL_Point{j,i})) {
+              //std::cout << "renderer open_path[" << i << "][" << j << "]: " << std::endl;
+              Pacman_base pb = Pacman_base(NAME_T::BACKGROUND, 0.0, 1.0, SDL_Point{j,i}, ALIVE_T::DEAD, Pacman_base::white);
+              SDL_Rect rect = map.get_sdl_rect(&pb);
+              SDL_SetRenderDrawColor(sdl_renderer, pb.color.r, pb.color.g, pb.color.b, 0xFF);
+              SDL_RenderFillRect(sdl_renderer, &rect);
+          }
+      }
   }
 
   // Update Screen
