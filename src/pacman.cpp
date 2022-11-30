@@ -21,6 +21,7 @@ Pacman_base::Pacman_base() {
     name = NAME_T::BACKGROUND;
     size_factor = 1;
     direction = Direction::noChange;
+    prev_direction = Direction::noChange;
 }
 
 Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t) {
@@ -31,6 +32,8 @@ Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Poi
     mode = alive_t; 
     color = rgb_t;
     size_factor = size_f;
+    direction = Direction::noChange;
+    prev_direction = Direction::noChange;
 }
 
 // bool Pacman_base::is_same_cell(SDL_Point ab) {
@@ -46,39 +49,96 @@ Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Poi
 // }
 
 void Pacman_base::update(Map &map) {
-    int y_update;
-    int x_update;
+    int update;
+    int last_update;
     prev_xy = xy;
+    
+    if(prev_direction != direction)
+    {
+        std::cout << "===========================================================================" << std::endl;
+        std::cout << "Start [" << xy.y << "][" << xy.x << "] " << std::endl;
+    }
+
     switch (direction) {
         case Direction::kUp:
-            y_update = xy.y - int(speed_factor);
-            if(map.is_path(SDL_Point{xy.x, y_update}))
-            {
-                xy.y = y_update;
+            // for (int i = 0 ; i < 5; ++i)
+            // {
+            //     for (int j = 0; j < 5; ++j)
+            //     {
+            //         std::cout << "Pacman::update " << direction << " [" << xy.y-2+i << "][" << xy.x-2+j << "] " << map.is_valid_path(SDL_Point{xy.x-2+j, xy.y-2+i}) << std::endl;
+            //     }
+            // }
+            //for (int i = 1; i <= int(speed_factor); ++i){
+            for (int i = int(speed_factor); i > 0; --i){
+                update = xy.y - i;
+                if(map.is_valid_path(SDL_Point{xy.x, update}))
+                {
+                    std::cout << "[" << update << "][" << xy.x << "] is open"  << std::endl;
+                    xy.y = update;
+                    break;
+                }
+                else
+                {
+                    last_update = update;
+                }
             }
             break;
         case Direction::kDown:
-            y_update = xy.y + int(speed_factor);
-            if(map.is_path(SDL_Point{xy.x, y_update}))
-            {
-                xy.y = y_update;
+            //for (int i = 1; i <= int(speed_factor); ++i){
+            for (int i = int(speed_factor); i > 0; --i){
+                update = xy.y + i;
+                if(map.is_valid_path(SDL_Point{xy.x, update}))
+                {
+                    std::cout << "[" << update << "][" << xy.x << "] is open"  << std::endl;
+                    xy.y = update;
+                    break;
+                }
+                else 
+                {
+                    last_update = update;
+                }
             }
             break;
         case Direction::kLeft:
-            x_update = xy.x - int(speed_factor);
-            if(map.is_path(SDL_Point{x_update, xy.y}))
-            {
-                xy.x = x_update;
+            //for (int i = 1; i <= int(speed_factor); ++i){
+            for (int i = int(speed_factor); i > 0; --i){
+                update = xy.x - i;
+                if(map.is_valid_path(SDL_Point{update, xy.y}))
+                {
+                    std::cout << "[" << xy.y << "][" << update << "] is open"  << std::endl;
+                    xy.x = update;
+                    break;
+                }
+                else 
+                {
+                    last_update = update;
+                }
             }
             break;
         case Direction::kRight:
-            x_update = xy.x + int(speed_factor);
-            if(map.is_path(SDL_Point{x_update, xy.y}))
-            {
-                xy.x = x_update;
+            //for (int i = 1; i <= int(speed_factor); ++i){
+            for (int i = int(speed_factor); i > 0; --i){
+                update = xy.x + i;
+                if(map.is_valid_path(SDL_Point{update, xy.y}))
+                {
+                    std::cout << "[" << xy.y << "][" << update << "] is open"  << std::endl;
+                    xy.x = update;
+                    break;
+                }
+                else
+                {
+                    last_update = update;
+                }
             }
             break;
     }
+
+    if(prev_direction != direction)
+    {
+        std::cout << "End [" << xy.y << "][" << xy.x << "] " << std::endl;
+    }
+
+    prev_direction = direction;
 }
 
 // void Pacman_base::update_rand(Map &map, int pos) {

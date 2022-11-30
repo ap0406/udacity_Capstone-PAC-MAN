@@ -110,11 +110,11 @@ void Renderer::Render(Map &map) {
       }
   }
 
-  for (int i = 0; i < screen_height; ++i)
-  {
-      for (int j = 0; j < screen_height; ++j)
-      {
-          if (map.is_path(SDL_Point{j,i})) {
+  for (int i = 0; i < screen_height; ++i){
+      for (int j = 0; j < screen_height; ++j){
+          bool* add_offset = map.get_open_path() + ( i * screen_height ) + j;
+          if(*add_offset) {
+          //if (map.is_path(SDL_Point{j,i})) {
               //std::cout << "renderer open_path[" << i << "][" << j << "]: " << std::endl;
               Pacman_base pb = Pacman_base(NAME_T::BACKGROUND, 0.0, 1.0, SDL_Point{j,i}, ALIVE_T::DEAD, Pacman_base::white);
               SDL_Rect rect = map.get_sdl_rect(&pb);

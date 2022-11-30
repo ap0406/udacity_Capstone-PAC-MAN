@@ -22,8 +22,8 @@ class Map {
         void set_moving_object(Pacman_base);
         void clear_moving_object(SDL_Point);
         SDL_Rect get_sdl_rect(Pacman_base*);
-        bool is_path(SDL_Point);
-        // bool is_map_open(SDL_Point xy);
+        bool is_valid_path(SDL_Point);
+        bool* get_open_path() { return open_path; };
         bool is_background_food(SDL_Point); 
         bool is_background_superfood(SDL_Point);
         bool is_background_ghost(SDL_Point);
@@ -35,7 +35,7 @@ class Map {
 
     private:
         Pacman_base* background[kGridSize][kGridSize];
-        bool open_path[kScreenSize][kScreenSize];
+        bool* open_path; //[kScreenSize][kScreenSize];
         Pacman_base* moving_objects;
         //Pacman_base moving_objects[kScreenSize];
         

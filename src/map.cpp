@@ -12,6 +12,7 @@ Map::Map() {
         }
     }
 
+    open_path = new bool[kScreenSize*kScreenSize];
     moving_objects = new Pacman_base[kScreenSize*kScreenSize];
     // std::cout << "background start " << background[0][0] << std::endl;
     // std::cout << "background end " << background[kGridSize-1][kGridSize-1] << std::endl;
@@ -26,6 +27,7 @@ Map::~Map() {
             delete background[i][j];
         }
     }
+    delete open_path;
     delete moving_objects;
 }
 
@@ -56,7 +58,9 @@ void Map::init() {
 
     for (int i = 0; i < kScreenSize; ++i) {
         for(int j = 0; j < kScreenSize; ++j) {
-            open_path[i][j] = false;
+            bool* addr_offset = open_path + ( i * kScreenSize ) + j;
+            *addr_offset = false;
+            //open_path[i][j] = false;
         }
     }
 
@@ -112,11 +116,15 @@ void Map::set_open_path(SDL_Point xy) {
             int start = (xy.x*get_screen_to_grid_ratio()) + int(get_screen_to_grid_ratio()/2);
             int end = start+get_screen_to_grid_ratio();
             int fixed = (xy.y*get_screen_to_grid_ratio()) + int(get_screen_to_grid_ratio()/2);
-            for(int i=start; i < end; ++i)
+            for(int i=start; i <= end; ++i)
             {
-                open_path[fixed][i] = true;
-                //std::cout << "open_path[" << xy.y << "][" << i << "]: " << std::endl;
+                //open_path[fixed][i] = true;
+                bool* addr_offset = open_path + ( fixed * kScreenSize ) + i;
+                *addr_offset = true;
+                //std::cout << "open_path[" << xy.y << "][" << i << "] " << std::endl;
             }
+            std::cout << "open_path_start[" << fixed << "][" << start << "] " << std::endl;
+            std::cout << "open_path_end  [" << fixed << "][" << end << "] " << std::endl;
         }
     }
 
@@ -125,11 +133,15 @@ void Map::set_open_path(SDL_Point xy) {
             int start = (xy.y*get_screen_to_grid_ratio()) + int(get_screen_to_grid_ratio()/2);
             int end = start+get_screen_to_grid_ratio();
             int fixed = (xy.x*get_screen_to_grid_ratio()) + + int(get_screen_to_grid_ratio()/2);
-            for(int j=start; j < end; ++j)
+            for(int j=start; j <= end; ++j)
             {
-                open_path[j][fixed] = true;
-                //std::cout << "open_path[" << j << "][" << xy.x << "]: " << std::endl;
+                //open_path[j][fixed] = true;
+                bool* addr_offset = open_path + ( j * kScreenSize ) + fixed;
+                *addr_offset = true;
+                //std::cout << "open_path[" << j << "][" << xy.x << "] " << std::endl;
             }
+            std::cout << "open_path_start[" << start << "][" << fixed << "] " << std::endl;
+            std::cout << "open_path_end  [" << end << "][" << fixed << "] " << std::endl;
         }
     }
 }
@@ -201,8 +213,9 @@ bool Map::is_background_ghost(SDL_Point xy) {
     return addr_offset->name == NAME_T::GHOST; 
 };
 
-bool Map::is_path(SDL_Point xy) {
-    return open_path[xy.y][xy.x];
+bool Map::is_valid_path(SDL_Point xy) {
+    bool* addr_offset = open_path + ( xy.y * kScreenSize ) + xy.x;
+    return *addr_offset;
 };
 
 // bool Map::is_map_open(SDL_Point xy) {

@@ -33,6 +33,7 @@ class Pacman_base {
         RGB_T color;
         NAME_T name;
         Direction direction;
+        Direction prev_direction;
         Pacman_base();
         Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);
         // bool is_same_cell(SDL_Point);
