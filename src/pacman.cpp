@@ -12,6 +12,7 @@ RGB_T Pacman_base::white {0xff, 0xff, 0xff};
 RGB_T Pacman_base::black {0x00, 0x00, 0x00}; 
 RGB_T Pacman_base::pink {0xcc, 0x00, 0xcc};
 RGB_T Pacman_base::orange {0xcc, 0x66, 0x00};
+uint8_t Pacman_base::update_cnt = 0;
 
 Pacman_base::Pacman_base() {
     speed_factor = 0;
@@ -22,6 +23,10 @@ Pacman_base::Pacman_base() {
     size_factor = 1;
     direction = Direction::noChange;
     prev_direction = Direction::noChange;
+    // for(uint8_t i = 0; i < kDirectionBufferSize; ++i)
+    // {
+    //     prev_direction[i] = Direction::noChange; 
+    // }
 }
 
 Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t) {
@@ -34,6 +39,10 @@ Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Poi
     size_factor = size_f;
     direction = Direction::noChange;
     prev_direction = Direction::noChange;
+    // for(uint8_t i = 0; i < kDirectionBufferSize; ++i)
+    // {
+    //     prev_direction[i] = Direction::noChange; 
+    // }
 }
 
 // bool Pacman_base::is_same_cell(SDL_Point ab) {
@@ -49,96 +58,166 @@ Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Poi
 // }
 
 void Pacman_base::update(Map &map) {
-    int update;
-    int last_update;
+    int update_x;
+    int update_y;
+    bool latch_valid_path = false;
+    Direction lcl_dir = Direction::noChange;
+
+    //int last_update;
     prev_xy = xy;
     
-    if(prev_direction != direction)
+    //use of history buffer to smooth out movement
+    // if(direction == Direction::noChange){
+    //     lcl_dir = prev_direction[update_cnt]; //look at the last value in history bufer
+    // }
+    // else {
+    //     lcl_dir = direction;
+    // }
+    if(direction == Direction::noChange)
     {
-        std::cout << "===========================================================================" << std::endl;
-        std::cout << "Start [" << xy.y << "][" << xy.x << "] " << std::endl;
+        lcl_dir = prev_direction;
+    }
+    else 
+    {
+        lcl_dir = direction;
     }
 
-    switch (direction) {
+    //lcl_dir = direction;
+
+    // if(lcl_dir != Direction::noChange)
+    // {
+    //     std::cout << "===========================================================================" << std::endl;
+    //     std::cout << lcl_dir << " Start [" << xy.y << "][" << xy.x << "] " << std::endl;
+    // }
+
+
+    switch (lcl_dir) {
         case Direction::kUp:
-            // for (int i = 0 ; i < 5; ++i)
-            // {
-            //     for (int j = 0; j < 5; ++j)
-            //     {
-            //         std::cout << "Pacman::update " << direction << " [" << xy.y-2+i << "][" << xy.x-2+j << "] " << map.is_valid_path(SDL_Point{xy.x-2+j, xy.y-2+i}) << std::endl;
-            //     }
-            // }
-            //for (int i = 1; i <= int(speed_factor); ++i){
-            for (int i = int(speed_factor); i > 0; --i){
-                update = xy.y - i;
-                if(map.is_valid_path(SDL_Point{xy.x, update}))
+            for (int y = int(speed_factor); y > 0; --y)
+            {
+                update_y = xy.y - y;
+                if(map.is_valid_path(SDL_Point{xy.x, update_y}))
                 {
-                    std::cout << "[" << update << "][" << xy.x << "] is open"  << std::endl;
-                    xy.y = update;
+                    // std::cout << "[" << update_y << "][" << xy.x << "] is open"  << std::endl;
+                    xy.y = update_y;
+                    latch_valid_path = true;
                     break;
                 }
-                else
+            }
+            //smooth out the control, align with next possible horizontal point
+            if (!latch_valid_path)
+            {
+                update_y = xy.y - 1; //find the next pixel up
+                for(int x = int(kAlignFactor * speed_factor); x > -int(kAlignFactor * speed_factor); --x)
                 {
-                    last_update = update;
+                    update_x = xy.x + x;
+                    if(map.is_valid_path(SDL_Point{update_x, update_y}))
+                    {
+                        // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
+                        xy.x = update_x;
+                        xy.y = update_y;
+                        break;
+                    }
                 }
             }
             break;
+
         case Direction::kDown:
-            //for (int i = 1; i <= int(speed_factor); ++i){
-            for (int i = int(speed_factor); i > 0; --i){
-                update = xy.y + i;
-                if(map.is_valid_path(SDL_Point{xy.x, update}))
+            for (int y = int(speed_factor); y > 0; --y)
+            {
+                update_y = xy.y + y;
+                if(map.is_valid_path(SDL_Point{xy.x, update_y}))
                 {
-                    std::cout << "[" << update << "][" << xy.x << "] is open"  << std::endl;
-                    xy.y = update;
+                    // std::cout << "[" << update_y << "][" << xy.x << "] is open"  << std::endl;
+                    xy.y = update_y;
+                    latch_valid_path = true;
                     break;
                 }
-                else 
+            }
+            //smooth out the control, align with next possible horizontal point
+            if (!latch_valid_path)
+            {
+                update_y = xy.y + 1; //find the next pixel down
+                for(int x = int(kAlignFactor * speed_factor); x > -int(kAlignFactor * speed_factor); --x)
                 {
-                    last_update = update;
+                    update_x = xy.x + x;
+                    if(map.is_valid_path(SDL_Point{update_x, update_y}))
+                    {
+                        // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
+                        xy.x = update_x; 
+                        xy.y = update_y;
+                        break;
+                    }
                 }
             }
             break;
         case Direction::kLeft:
-            //for (int i = 1; i <= int(speed_factor); ++i){
-            for (int i = int(speed_factor); i > 0; --i){
-                update = xy.x - i;
-                if(map.is_valid_path(SDL_Point{update, xy.y}))
+            for (int x = int(speed_factor); x > 0; --x)
+            {
+                update_x = xy.x - x;
+                if(map.is_valid_path(SDL_Point{update_x, xy.y}))
                 {
-                    std::cout << "[" << xy.y << "][" << update << "] is open"  << std::endl;
-                    xy.x = update;
+                    // std::cout << "[" << xy.y << "][" << update_x << "] is open"  << std::endl;
+                    xy.x = update_x;
+                    latch_valid_path = true;
                     break;
                 }
-                else 
+            }
+            if (!latch_valid_path)
+            {
+                update_x = xy.x - 1; //find the next pixel left
+                for(int y = int(kAlignFactor * speed_factor); y > -int(kAlignFactor * speed_factor); --y)
                 {
-                    last_update = update;
+                    update_y = xy.y + y;
+                    if(map.is_valid_path(SDL_Point{update_x, update_y}))
+                    {
+                        // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
+                        xy.y = update_y; 
+                        xy.x = update_x;
+                        break;
+                    }
                 }
             }
             break;
         case Direction::kRight:
-            //for (int i = 1; i <= int(speed_factor); ++i){
-            for (int i = int(speed_factor); i > 0; --i){
-                update = xy.x + i;
-                if(map.is_valid_path(SDL_Point{update, xy.y}))
+            for (int x = int(speed_factor); x > 0; --x)
+            {
+                update_x = xy.x + x; //find the next pixel right
+                if(map.is_valid_path(SDL_Point{update_x, xy.y}))
                 {
-                    std::cout << "[" << xy.y << "][" << update << "] is open"  << std::endl;
-                    xy.x = update;
+                    // std::cout << "[" << xy.y << "][" << update_x << "] is open"  << std::endl;
+                    xy.x = update_x;
+                    latch_valid_path = true;
                     break;
                 }
-                else
+            }
+            if (!latch_valid_path)
+            {
+                update_x = xy.x + 1;
+                for(int y = int(kAlignFactor * speed_factor); y > -int(kAlignFactor * speed_factor); --y)
                 {
-                    last_update = update;
+                    update_y = xy.y + y;
+                    if(map.is_valid_path(SDL_Point{update_x, update_y}))
+                    {
+                        // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
+                        xy.y = update_y;
+                        xy.x = update_x;
+                        break;
+                    }
                 }
             }
             break;
     }
 
-    if(prev_direction != direction)
-    {
-        std::cout << "End [" << xy.y << "][" << xy.x << "] " << std::endl;
-    }
+    // if(lcl_dir != Direction::noChange)
+    // {
+    //     std::cout << lcl_dir << " End [" << xy.y << "][" << xy.x << "] " << std::endl;
+    // }
 
     prev_direction = direction;
+    // prev_direction[update_cnt] = direction;
+    // ++update_cnt;
+    // if(update_cnt == kDirectionBufferSize) { update_cnt = 0; }
 }
 
 // void Pacman_base::update_rand(Map &map, int pos) {

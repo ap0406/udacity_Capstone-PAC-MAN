@@ -123,8 +123,8 @@ void Map::set_open_path(SDL_Point xy) {
                 *addr_offset = true;
                 //std::cout << "open_path[" << xy.y << "][" << i << "] " << std::endl;
             }
-            std::cout << "open_path_start[" << fixed << "][" << start << "] " << std::endl;
-            std::cout << "open_path_end  [" << fixed << "][" << end << "] " << std::endl;
+            // std::cout << "open_path_start[" << fixed << "][" << start << "] " << std::endl;
+            // std::cout << "open_path_end  [" << fixed << "][" << end << "] " << std::endl;
         }
     }
 
@@ -140,8 +140,8 @@ void Map::set_open_path(SDL_Point xy) {
                 *addr_offset = true;
                 //std::cout << "open_path[" << j << "][" << xy.x << "] " << std::endl;
             }
-            std::cout << "open_path_start[" << start << "][" << fixed << "] " << std::endl;
-            std::cout << "open_path_end  [" << end << "][" << fixed << "] " << std::endl;
+            // std::cout << "open_path_start[" << start << "][" << fixed << "] " << std::endl;
+            // std::cout << "open_path_end  [" << end << "][" << fixed << "] " << std::endl;
         }
     }
 }

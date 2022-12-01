@@ -24,6 +24,9 @@ class Pacman_base {
         static RGB_T black;
         static RGB_T pink;
         static RGB_T orange;
+        static uint8_t update_cnt;
+        static constexpr uint8_t kDirectionBufferSize {5};
+        static constexpr uint8_t kAlignFactor {5};
 
         uint8_t speed_factor;
         uint8_t size_factor;
@@ -33,6 +36,7 @@ class Pacman_base {
         RGB_T color;
         NAME_T name;
         Direction direction;
+        //Direction prev_direction[kDirectionBufferSize];
         Direction prev_direction;
         Pacman_base();
         Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);

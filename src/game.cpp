@@ -107,7 +107,7 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
 // }
 
 void Game::InitGame(Map &map) {
-    pacman = Pacman_base(NAME_T::PACMAN, 5, 10, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
+    pacman = Pacman_base(NAME_T::PACMAN, 2, 10, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
     map.set_moving_object(pacman);
 
     // ghost[0] = Pacman_base(NAME_T::GHOST, 2, 10, map.get_ghost_start_point(0,-1), ALIVE_T::LIVE, Pacman_base::red);
