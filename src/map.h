@@ -8,6 +8,13 @@
 #include "pacman.h"
 
 enum GRID_T { block, open, nouse };
+enum FOOD_T { food, superfood, nofood };
+struct STRUCT_RET
+{
+    bool result;
+    SDL_Point xy;
+
+};
 
 class Map {
     public:
@@ -15,6 +22,7 @@ class Map {
         static constexpr std::size_t kScreenSize{608};
         static constexpr std::size_t kGridSize{19};
         static GRID_T blueprint[kGridSize][kGridSize];
+        static FOOD_T blueprint_food[kGridSize][kGridSize];
 
         Map();
         ~Map();
@@ -24,14 +32,11 @@ class Map {
         SDL_Rect get_sdl_rect(Pacman_base*);
         bool is_valid_path(SDL_Point);
         bool* get_open_path() { return open_path; };
-        bool is_background_food(SDL_Point); 
-        bool is_background_superfood(SDL_Point);
-        bool is_background_ghost(SDL_Point);
+        STRUCT_RET is_background(SDL_Point, SDL_Point, NAME_T);
+        bool is_background(SDL_Point, NAME_T); 
         Pacman_base* get_background(int i, int j) { return background[i][j]; }
         Pacman_base* get_moving_objects() { return moving_objects; }
         SDL_Point get_pacman_start_point();
-        // SDL_Point get_ghost_start_point(int,int);
-        // SDL_Point get_super_food_point(int);
 
     private:
         Pacman_base* background[kGridSize][kGridSize];
@@ -41,12 +46,14 @@ class Map {
         
         void init();
         void set_open_path(SDL_Point);
+        void place_food();
         Pacman_base get_background_obj(SDL_Point, uint8_t);
         SDL_Point get_grid_centered(SDL_Point);
         Pacman_base get_background_obj_centered(SDL_Point);
         void conv_background_to_objects();
-        // Pacman_base backobj;
-        // SDL_Point super_food_xy[4] { {1,3}, {17,3}, {1, 15}, {17,15}};
+        STRUCT_RET is_background_x_fix_y_var(int, int, int, NAME_T);
+        STRUCT_RET is_background_x_var_y_fix(int, int, int, NAME_T);
+
 
 };
 

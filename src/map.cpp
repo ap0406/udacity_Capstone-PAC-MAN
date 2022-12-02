@@ -19,6 +19,7 @@ Map::Map() {
 
     init();
     conv_background_to_objects();
+    place_food();
 }
 
 Map::~Map() {
@@ -52,6 +53,29 @@ GRID_T Map::blueprint[kGridSize][kGridSize] =
         { GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block },
         { GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block },
         { GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block }
+    };
+
+FOOD_T Map::blueprint_food[kGridSize][kGridSize] = 
+    {
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::superfood, FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::superfood, FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::superfood, FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::superfood, FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   }
     };
 
 void Map::init() {
@@ -106,6 +130,29 @@ void Map::conv_background_to_objects() {
             if ( blueprint[i][j] == GRID_T::block ) {
                 background[i][j]->color = Pacman_base::blue;
             }   
+        }
+    }
+}
+
+void Map::place_food() {
+    for(int i = 0; i < kGridSize; ++i) {
+        for(int j = 0; j < kGridSize; ++j) {
+            if ( blueprint_food[i][j] == FOOD_T::food ) {
+                Pacman_base food = get_background_obj_centered(SDL_Point{j,i});
+                food.size_factor = 2;
+                food.color = Pacman_base::white;
+                food.mode = ALIVE_T::LIVE;
+                food.name = NAME_T::FOOD;
+                set_moving_object(food);
+            }
+            else if ( blueprint_food[i][j] == FOOD_T::superfood ) {
+                Pacman_base food = get_background_obj_centered(SDL_Point{j,i});
+                food.size_factor = 5;
+                food.color = Pacman_base::white;
+                food.mode = ALIVE_T::LIVE;
+                food.name = NAME_T::SUPERFOOD;
+                set_moving_object(food);
+            }  
         }
     }
 }
@@ -184,10 +231,13 @@ SDL_Point Map::get_pacman_start_point() {
 
 void Map::set_moving_object(Pacman_base pb) {
     Pacman_base* addr_offset = moving_objects + ( pb.xy.y * kScreenSize ) + pb.xy.x;
-    //std::cout << "setting moving object old: " << addr_offset << " " << addr_offset->name << std::endl;
+    if( addr_offset->name != NAME_T::BACKGROUND)
+    {
+        std::cout << "setting moving object old: "  << addr_offset->name << std::endl;
+        std::cout << "setting moving object new: "  << pb.name << std::endl;
+    }
     //over write memory with new object
     *addr_offset = pb;
-    //std::cout << "setting moving object new: " << addr_offset << " " << addr_offset->name << std::endl;
 };
 
 void Map::clear_moving_object(SDL_Point xy) {
@@ -198,19 +248,120 @@ void Map::clear_moving_object(SDL_Point xy) {
     //std::cout << "clear moving object new: " << addr_offset << " " << addr_offset->name << std::endl;
 };
 
-bool Map::is_background_food(SDL_Point xy) {
-    Pacman_base* addr_offset = moving_objects + ( xy.y * kScreenSize ) + xy.x;
-    return addr_offset->name == NAME_T::FOOD; 
+STRUCT_RET Map::is_background_x_fix_y_var( int x, int y1, int y2, NAME_T name)
+{
+    int y_delta;
+    int y_start;
+
+    if(y1 > y2)
+    {
+        y_delta = y1 -y2;
+        y_start = y2;
+    }
+    else 
+    {
+        y_delta = y2 - y1;
+        y_start = y1;
+    }
+
+    for(int i = 0; i <= y_delta; ++i)
+    {
+        int this_y = y_start + i;
+        if(is_valid_path(SDL_Point{x, this_y}))
+        {
+            Pacman_base* addr_offset = moving_objects + ( this_y * kScreenSize ) + x;
+            if( addr_offset->name == name )
+                return STRUCT_RET{true, SDL_Point{x, this_y}};
+        }
+    }
+    return STRUCT_RET{false, SDL_Point{0,0}};
+}
+
+STRUCT_RET Map::is_background_x_var_y_fix( int x1, int x2, int y, NAME_T name)
+{
+    int x_delta;
+    int x_start;
+
+    if(x1 > x2)
+    {
+        x_delta = x1 -x2;
+        x_start = x2;
+    }
+    else 
+    {
+        x_delta = x2 - x1;
+        x_start = x1;
+    }
+
+    for(int i = 0; i <= x_delta; ++i)
+    {
+        int this_x = x_start + i;
+        if(is_valid_path(SDL_Point{this_x, y}))
+        {
+            Pacman_base* addr_offset = moving_objects + ( y * kScreenSize ) + this_x;
+            if( addr_offset->name == name )
+                return STRUCT_RET{true, SDL_Point{this_x, y}};
+        }
+    }
+
+    return STRUCT_RET{false, SDL_Point{0,0}}; 
+}
+
+STRUCT_RET Map::is_background(SDL_Point xy1, SDL_Point xy2, NAME_T name) {
+    STRUCT_RET _return;
+    _return = is_background_x_fix_y_var(xy1.x, xy1.y, xy2.y, name);
+    if(_return.result)
+    {
+        //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+        return _return;
+    }
+    _return = is_background_x_var_y_fix(xy1.x, xy2.x, xy1.y, name);
+    if(_return.result)
+    {
+        return _return;
+    }
+    _return = is_background_x_fix_y_var(xy2.x, xy1.y, xy2.y, name);
+    if(_return.result)
+    {
+        return _return;
+    }
+    _return = is_background_x_var_y_fix(xy1.x, xy2.x, xy2.y, name);
+    if(_return.result)
+    {
+        return _return;
+    }
+    _return = STRUCT_RET{false, SDL_Point{0,0}};
+    return _return;
+
+    // if(is_background_x_fix_y_var(xy1.x, xy1.y, xy2.y, name)) 
+    // { 
+    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+    //     return true; 
+    // }
+    // else if(is_background_x_var_y_fix(xy1.x, xy2.x, xy1.y, name)) 
+    // { 
+    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+    //     return true; 
+    // }
+    // else if(is_background_x_fix_y_var(xy2.x, xy1.y, xy2.y, name)) 
+    // { 
+    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+    //     return true; 
+    // }
+    // else if(is_background_x_var_y_fix(xy1.x, xy2.x, xy2.y, name)) 
+    // { 
+    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+    //     return true; 
+    // }
+    // else 
+    // {
+    //     return false;
+    // }
 };
 
-bool Map::is_background_superfood(SDL_Point xy) {
+bool Map::is_background(SDL_Point xy, NAME_T name) {
     Pacman_base* addr_offset = moving_objects + ( xy.y * kScreenSize ) + xy.x;
-    return addr_offset->name == NAME_T::SUPERFOOD; 
-};
-
-bool Map::is_background_ghost(SDL_Point xy) { 
-    Pacman_base* addr_offset = moving_objects + ( xy.y * kScreenSize ) + xy.x;
-    return addr_offset->name == NAME_T::GHOST; 
+    return addr_offset->name == name; 
 };
 
 bool Map::is_valid_path(SDL_Point xy) {
@@ -218,6 +369,3 @@ bool Map::is_valid_path(SDL_Point xy) {
     return *addr_offset;
 };
 
-// bool Map::is_map_open(SDL_Point xy) {
-//     return open_path[xy.y][xy.x];
-// };

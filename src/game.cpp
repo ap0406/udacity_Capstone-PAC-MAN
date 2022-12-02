@@ -59,53 +59,6 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
 
 }
 
-// void Game::PlaceFood(Map &map) {   
-//     for(int i = 0; i < Map::kGridSize; ++i) {
-//         for(int j = 0; j < Map::kGridSize; ++j) {
-//             int x_scale = j * map.get_grid_width_size();
-//             int y_scale = i * map.get_grid_height_size();
-//             SDL_Point xy = {x_scale, y_scale};
-//             //if(map.is_map_open(xy) && !(pacman.is_same_cell(xy) || ghost[0].is_same_cell(xy) || ghost[1].is_same_cell(xy) || ghost[2].is_same_cell(xy) || ghost[3].is_same_cell(xy) || super_food[0].is_same_cell(xy) || super_food[1].is_same_cell(xy) || super_food[2].is_same_cell(xy) || super_food[3].is_same_cell(xy))) 
-//             if(map.is_map_open(xy))
-//             {
-//                 //std::cout << "food[x] " << xy.x << " food[y] "<< xy.y << std::endl;
-//                 food.emplace_back(Pacman_base(NAME_T::FOOD, 0, 2, xy, ALIVE_T::LIVE, Pacman_base::white));
-//             }
-//         }
-//     }
-// }
-// void Game::PlaceSuperFood(Map &map) {
-//     // SDL_Point* sfp = map.get_super_food_point();
-//     // std::cout << sfp << std::endl;
-//     // int placed{0};
-//     for (int i = 0; i < 4; ++i)
-//     {
-//       SDL_Point xy = map.get_super_food_point(i);
-//       //  std::cout << i << std::endl;
-//        //std::cout << "super food[x] " << xy.x << " super_food[y] "<< xy.y << std::endl;
-//        super_food[i] = Pacman_base(NAME_T::SUPERFOOD, 0, 5, xy, ALIVE_T::LIVE, Pacman_base::white);
-//       //  ++placed;
-//     }
-//     // while (true) {
-//     //   int x_scale = random_w(engine) * map.get_grid_width_size();
-//     //   int y_scale = random_h(engine) * map.get_grid_height_size();
-//     //   SDL_Point xy{x_scale, y_scale};
-//     //   // Check that the location is not occupied by oridinary food or pacman item before placing
-//     //   // Super food.
-//     //   //if(map.is_map_open(xy) && !(pacman.is_same_cell(xy) || ghost[0].is_same_cell(xy) || ghost[1].is_same_cell(xy) || ghost[2].is_same_cell(xy) || ghost[3].is_same_cell(xy))) 
-//     //   if(map.is_map_open(xy))
-//     //   {
-//     //     //Pacman_base pb (0.0, 0.5, xy, ALIVE_T::DEAD, Pacman_base::white);
-//     //     std::cout << "super food[x] " << xy.x << " super_food[y] "<< xy.y << std::endl;
-//     //     super_food[placed] = Pacman_base(NAME_T::SUPERFOOD, 0.0, 0.5, xy, ALIVE_T::LIVE, Pacman_base::white);
-        
-//     //     ++placed;
-//     //     if (placed == 4) 
-//     //       return;
-//     //   }
-//     // }
-// }
-
 void Game::InitGame(Map &map) {
     pacman = Pacman_base(NAME_T::PACMAN, 2, 10, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
     map.set_moving_object(pacman);
@@ -115,60 +68,36 @@ void Game::InitGame(Map &map) {
     // ghost[2] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(1,0), ALIVE_T::LIVE, Pacman_base::orange);
     // ghost[3] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(-1,0), ALIVE_T::LIVE, Pacman_base::pink);
 
-    // PlaceSuperFood(map);
-
-    // PlaceFood(map);
 }
 
-// void Game::SetMovingObjects(Map &map) {
+void Game::SetMovingObjects(Map &map) {
 
-//     for (auto const i : food) {
-//       //std::cout << i.xy.x << " " << i.xy.y << std::endl;
-//       map.set_moving_object(i);
-//     }
+    // for (int i = 0; i < kNumGhosts; ++i) {
+    //   map.set_moving_object(ghost[i]);
+    // }
 
-//     for (auto i = 0; i < 4; ++i) {
-//       map.set_moving_object(super_food[i]);
-//     }
+    map.set_moving_object(pacman);
+}
 
-//     for (auto i = 0; i < 4; ++i) {
-//       map.set_moving_object(ghost[i]);
-//     }
+void Game::ClearMovingObjects(Map &map) {
 
-//     map.set_moving_object(pacman);
-// }
+    // for (int i = 0; i < kNumGhosts; ++i) {
+    //   map.clear_moving_object(ghost[i].prev_xxy);
+    // }
 
-// void Game::ClearMovingObjects(Map &map) {
-
-//     for (auto const i : food) {
-//       map.clear_moving_object(i.xy);
-//     }
-
-//     for (auto i = 0; i < 4; ++i) {
-//       map.clear_moving_object(super_food[i].xy);
-//     }
-
-//     for (auto i = 0; i < 4; ++i) {
-//       map.clear_moving_object(ghost[i].xy);
-//     }
-
-//     map.clear_moving_object(pacman.xy);
-// }
+    map.clear_moving_object(pacman.prev_xy);
+}
 
 void Game::Update(Map &map) {
 
   //update pacman to new location
   pacman.update(map);
 
-  // if (map.is_background_food(pacman.xy)) {
-  //   score++;
-  //   //clear food
-  //   map.clear_moving_object(pacman.xy);
-  // }
-  //clear pacman from old location
-  map.clear_moving_object(pacman.prev_xy);
-  //set pacman to new location
-  map.set_moving_object(pacman);
+  if (map.is_background(pacman.prev_xy, pacman.xy, NAME_T::FOOD).result) {
+    score++;
+    //clear food
+    //map.clear_moving_object(pacman.xy);
+  }
 
   // ghost[0].update_rand(map, random_dir(engine));
   // //clear ghost from old location
@@ -180,6 +109,9 @@ void Game::Update(Map &map) {
   // ghost[1].update_rand(map, random_dir(engine));
   // ghost[2].update_rand(map, random_dir(engine));
   // ghost[3].update_rand(map, random_dir(engine));
+
+  ClearMovingObjects(map);
+  SetMovingObjects(map);
   
 }
 
