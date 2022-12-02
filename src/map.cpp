@@ -14,12 +14,13 @@ Map::Map() {
 
     open_path = new bool[kScreenSize*kScreenSize];
     moving_objects = new Pacman_base[kScreenSize*kScreenSize];
+    food_copy = new Pacman_base[kGridSize*kGridSize];
     // std::cout << "background start " << background[0][0] << std::endl;
     // std::cout << "background end " << background[kGridSize-1][kGridSize-1] << std::endl;
 
     init();
     conv_background_to_objects();
-    place_food();
+    generate_food();
 }
 
 Map::~Map() {
@@ -30,6 +31,7 @@ Map::~Map() {
     }
     delete open_path;
     delete moving_objects;
+    delete food_copy;
 }
 
 GRID_T Map::blueprint[kGridSize][kGridSize] = 
@@ -68,7 +70,7 @@ FOOD_T Map::blueprint_food[kGridSize][kGridSize] =
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
-        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::superfood, FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood   },
@@ -101,6 +103,10 @@ void Map::init() {
     for(int i = 0; i < kGridSize; ++i) {
         for(int j = 0; j < kGridSize; ++j) {
             set_open_path(SDL_Point{j,i});
+
+            //initialize food storage with background obj
+            Pacman_base* addr_offset = food_copy + ( i * kGridSize ) + j;
+            *addr_offset = get_background_obj(SDL_Point{j,i}, 1); 
         }
     }
 }
@@ -113,6 +119,14 @@ SDL_Point Map::get_grid_centered(SDL_Point xy) {
     int y_scaled = ( ( xy.y + 1 ) * get_screen_to_grid_ratio() ) - int( get_screen_to_grid_ratio() / 2 );
     int x_scaled = ( ( xy.x + 1 ) * get_screen_to_grid_ratio() ) - int( get_screen_to_grid_ratio() / 2 ) ;
     return SDL_Point{x_scaled,y_scaled};
+}
+
+//convert screen xy -> grid xy
+SDL_Point Map::get_screen_to_grid_xy(SDL_Point xy)
+{
+    int x = int(xy.x / get_screen_to_grid_ratio());
+    int y = int(xy.y / get_screen_to_grid_ratio());
+    return SDL_Point{x,y};
 }
 
 Pacman_base Map::get_background_obj_centered(SDL_Point xy) {
@@ -134,7 +148,7 @@ void Map::conv_background_to_objects() {
     }
 }
 
-void Map::place_food() {
+void Map::generate_food() {
     for(int i = 0; i < kGridSize; ++i) {
         for(int j = 0; j < kGridSize; ++j) {
             if ( blueprint_food[i][j] == FOOD_T::food ) {
@@ -143,7 +157,7 @@ void Map::place_food() {
                 food.color = Pacman_base::white;
                 food.mode = ALIVE_T::LIVE;
                 food.name = NAME_T::FOOD;
-                set_moving_object(food);
+                set_food_copy(food);
             }
             else if ( blueprint_food[i][j] == FOOD_T::superfood ) {
                 Pacman_base food = get_background_obj_centered(SDL_Point{j,i});
@@ -151,7 +165,21 @@ void Map::place_food() {
                 food.color = Pacman_base::white;
                 food.mode = ALIVE_T::LIVE;
                 food.name = NAME_T::SUPERFOOD;
-                set_moving_object(food);
+                set_food_copy(food);
+            }  
+        }
+    }
+}
+
+void Map::place_food_to_moving_objects() {
+    for(int i = 0; i < kGridSize; ++i) {
+        for(int j = 0; j < kGridSize; ++j) {
+            Pacman_base* food = food_copy + ( i * kGridSize ) + j;
+            if ( food->name == NAME_T::FOOD ) {
+                set_moving_object(*food);
+            }
+            else if ( food->name == NAME_T::SUPERFOOD ) {
+                set_moving_object(*food);
             }  
         }
     }
@@ -229,24 +257,60 @@ SDL_Point Map::get_pacman_start_point() {
 //     // return xy[0]; 
 // }
 
-void Map::set_moving_object(Pacman_base pb) {
+void Map::set_moving_object(Pacman_base pb) 
+{
     Pacman_base* addr_offset = moving_objects + ( pb.xy.y * kScreenSize ) + pb.xy.x;
-    if( addr_offset->name != NAME_T::BACKGROUND)
-    {
-        std::cout << "setting moving object old: "  << addr_offset->name << std::endl;
-        std::cout << "setting moving object new: "  << pb.name << std::endl;
-    }
+    // if( addr_offset->name != NAME_T::BACKGROUND)
+    // {
+    //     std::cout << "setting moving object old: "  << addr_offset->name << std::endl;
+    //     std::cout << "setting moving object new: "  << pb.name << std::endl;
+    // }
     //over write memory with new object
     *addr_offset = pb;
 };
 
-void Map::clear_moving_object(SDL_Point xy) {
+void Map::clear_moving_object(SDL_Point xy) 
+{
     Pacman_base* addr_offset = moving_objects + ( xy.y * kScreenSize ) + xy.x;
     //std::cout << "clear moving object old: " << addr_offset << " " << addr_offset->name << std::endl;
     //over write memory with new object
     *addr_offset = get_background_obj(xy, 1); ;
     //std::cout << "clear moving object new: " << addr_offset << " " << addr_offset->name << std::endl;
 };
+
+void Map::set_food_copy(Pacman_base pb) 
+{
+    SDL_Point xy_grid {get_screen_to_grid_xy(pb.xy)};
+    // std::cout << "Setting food copy xy1[x][y] " << pb.xy.x << " " << pb.xy.y << " converted to xy2[x][y] " << xy_grid.x << " " << xy_grid.y << std::endl;
+
+    Pacman_base* addr_offset = food_copy + ( xy_grid.y * kGridSize ) + xy_grid.x;
+    // if( (addr_offset->name != NAME_T::FOOD) || (addr_offset->name != NAME_T::SUPERFOOD) )
+    // {
+    //     std::cout << "setting food object old: "  << addr_offset->name << std::endl;
+    //     std::cout << "setting food object new: "  << pb.name << std::endl;
+    // }
+    //over write memory with new object
+    *addr_offset = pb;
+};
+
+//xy in [screenwidth] x [screenwidth]
+void Map::clear_food_copy(SDL_Point xy) 
+{
+    SDL_Point xy_grid {get_screen_to_grid_xy(xy)};
+    // std::cout << "Clearing food copy xy1[x][y] " << xy.x << " " << xy.y << " converted to xy2[x][y] " << xy_grid.x << " " << xy_grid.y << std::endl;
+
+    Pacman_base* addr_offset = food_copy + ( xy_grid.y * kGridSize ) + xy_grid.x;
+    // if( (addr_offset->name != NAME_T::FOOD) || (addr_offset->name != NAME_T::SUPERFOOD) )
+    // {
+    //     std::cout << "Clearing food object old: "  << addr_offset->name << std::endl;
+    // }
+    //over write memory with new object
+    *addr_offset = get_background_obj(xy_grid, 1);
+
+    //also clear the moving object, otherwise it may keep food pixel
+    clear_moving_object(xy);
+};
+
 
 STRUCT_RET Map::is_background_x_fix_y_var( int x, int y1, int y2, NAME_T name)
 {
@@ -312,22 +376,25 @@ STRUCT_RET Map::is_background(SDL_Point xy1, SDL_Point xy2, NAME_T name) {
     _return = is_background_x_fix_y_var(xy1.x, xy1.y, xy2.y, name);
     if(_return.result)
     {
-        //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = is_background_x_var_y_fix(xy1.x, xy2.x, xy1.y, name);
     if(_return.result)
     {
+        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = is_background_x_fix_y_var(xy2.x, xy1.y, xy2.y, name);
     if(_return.result)
     {
+        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = is_background_x_var_y_fix(xy1.x, xy2.x, xy2.y, name);
     if(_return.result)
     {
+        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = STRUCT_RET{false, SDL_Point{0,0}};

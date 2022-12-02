@@ -27,8 +27,12 @@ class Map {
         Map();
         ~Map();
         int get_screen_to_grid_ratio() { return static_cast<int> (kScreenSize/kGridSize); }
+        SDL_Point get_screen_to_grid_xy(SDL_Point);
         void set_moving_object(Pacman_base);
         void clear_moving_object(SDL_Point);
+        void set_food_copy(Pacman_base);
+        void clear_food_copy(SDL_Point);
+        void place_food_to_moving_objects();
         SDL_Rect get_sdl_rect(Pacman_base*);
         bool is_valid_path(SDL_Point);
         bool* get_open_path() { return open_path; };
@@ -40,13 +44,14 @@ class Map {
 
     private:
         Pacman_base* background[kGridSize][kGridSize];
-        bool* open_path; //[kScreenSize][kScreenSize];
+        bool* open_path; //
+        Pacman_base* food_copy; //store food information here, so that you can set it again when ghosts move over it
         Pacman_base* moving_objects;
         //Pacman_base moving_objects[kScreenSize];
         
         void init();
         void set_open_path(SDL_Point);
-        void place_food();
+        void generate_food();
         Pacman_base get_background_obj(SDL_Point, uint8_t);
         SDL_Point get_grid_centered(SDL_Point);
         Pacman_base get_background_obj_centered(SDL_Point);

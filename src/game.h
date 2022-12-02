@@ -33,6 +33,8 @@ class Game {
   std::uniform_int_distribution<int> random_h;
   std::uniform_int_distribution<int> random_dir;
 
+  bool pacman_attack_mode;
+
   int score{0};
 
   void InitGame(Map &map);

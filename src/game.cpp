@@ -7,7 +7,7 @@ Game::Game()
       random_w(0, static_cast<int>(Map::kGridSize - 1)),
       random_h(0, static_cast<int>(Map::kGridSize - 1)),
       random_dir(0, 4) {
-  //PlaceFood();
+  pacman_attack_mode = false;
 }
 
 void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::size_t target_frame_duration) {
@@ -19,8 +19,6 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
   bool running = true;
 
   InitGame(map);
-  
-  // SetMovingObjects(map);
 
   while (running) {
     frame_start = SDL_GetTicks();
@@ -60,6 +58,8 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
 }
 
 void Game::InitGame(Map &map) {
+    map.place_food_to_moving_objects();
+
     pacman = Pacman_base(NAME_T::PACMAN, 2, 10, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
     map.set_moving_object(pacman);
 
@@ -72,11 +72,13 @@ void Game::InitGame(Map &map) {
 
 void Game::SetMovingObjects(Map &map) {
 
+    map.place_food_to_moving_objects();
+    map.set_moving_object(pacman);
+
     // for (int i = 0; i < kNumGhosts; ++i) {
     //   map.set_moving_object(ghost[i]);
     // }
 
-    map.set_moving_object(pacman);
 }
 
 void Game::ClearMovingObjects(Map &map) {
@@ -93,10 +95,22 @@ void Game::Update(Map &map) {
   //update pacman to new location
   pacman.update(map);
 
-  if (map.is_background(pacman.prev_xy, pacman.xy, NAME_T::FOOD).result) {
+  STRUCT_RET _return = map.is_background(pacman.prev_xy, pacman.xy, NAME_T::FOOD);
+  if (_return.result) {
     score++;
     //clear food
-    //map.clear_moving_object(pacman.xy);
+    map.clear_food_copy(_return.xy);
+  }
+
+  _return = map.is_background(pacman.prev_xy, pacman.xy, NAME_T::SUPERFOOD);
+  if (_return.result) {
+    score += 50;
+    //set attack mode
+    pacman_attack_mode = true;
+    //change pacman speed to fast
+    pacman.speed_factor = 4;
+    //clear food
+    map.clear_food_copy(_return.xy);
   }
 
   // ghost[0].update_rand(map, random_dir(engine));
