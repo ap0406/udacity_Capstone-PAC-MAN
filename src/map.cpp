@@ -2,6 +2,9 @@
 #include <iostream>
 #include <memory>
 #include "SDL.h"
+#include <cmath>
+#include <limits>
+#include <algorithm>
 
 Map::Map() {
 
@@ -231,31 +234,14 @@ SDL_Rect Map::get_sdl_rect(Pacman_base* pb) {
 }
 
 SDL_Point Map::get_pacman_start_point() { 
-    SDL_Point xy {9,11}; //grid xy coordinates
-    // int x = xy.x * get_screen_to_grid_ratio();
-    // int y = xy.y * get_screen_to_grid_ratio(); 
+    SDL_Point xy {9,11}; //grid xy coordinates 
     return get_grid_centered(xy);
 }
 
-// SDL_Point Map::get_ghost_start_point(int x, int y)  {
-//     SDL_Point xy {9+x,9+y};
-//     int x_scaled = xy.x * get_screen_to_grid_ratio();
-//     int y_scaled = xy.y * get_screen_to_grid_ratio();
-//     return SDL_Point{x_scaled,y_scaled}; 
-// }
-
-// SDL_Point Map::get_super_food_point(int i)  {
-//     int x_scaled = super_food_xy[i].x * get_screen_to_grid_ratio();
-//     int y_scaled = super_food_xy[i].y * get_screen_to_grid_ratio();
-//     return SDL_Point{x_scaled,y_scaled}; 
-//     // for (auto i = 0 ; i < 4 ; ++i)
-//     // {
-//     //     xy[i].x = xy[i].x * get_screen_to_grid_ratio();
-//     //     xy[i].y = xy[i].y * get_screen_to_grid_ratio();
-//     //     std::cout << "sf: " << xy[i].x << " " << xy[i].y << std::endl;
-//     // }
-//     // return xy[0]; 
-// }
+SDL_Point Map::get_ghost_start_point(int x, int y)  {
+    SDL_Point xy {6+x,8+y};
+    return get_grid_centered(xy);
+}
 
 void Map::set_moving_object(Pacman_base pb) 
 {
@@ -311,6 +297,32 @@ void Map::clear_food_copy(SDL_Point xy)
     clear_moving_object(xy);
 };
 
+struct CALC_DIST_T{
+    Direction dir;
+    double dist;
+};
+
+bool comp_funct(CALC_DIST_T* i, CALC_DIST_T* j) { return (i->dist < j->dist); };
+
+//assumes that destination is always in the path
+Direction Map::calc_shortest_dist( SDL_Point src, SDL_Point dest)
+{
+
+    SDL_Point pup {src.x, src.y-1};
+    SDL_Point pdn {src.x, src.y+1};
+    SDL_Point ple {src.x-1, src.y};
+    SDL_Point pri {src.x+1, src.y};
+
+    CALC_DIST_T distr {Direction::kRight, is_valid_path(pri) ? ( pow((pri.x-dest.x), 2) + pow((pri.y-dest.y), 2) ) : std::numeric_limits<double>::max()};
+    CALC_DIST_T distl {Direction::kLeft, is_valid_path(ple) ? ( pow((ple.x-dest.x), 2) + pow((ple.y-dest.y), 2) ) : std::numeric_limits<double>::max()};
+    CALC_DIST_T distu {Direction::kUp, is_valid_path(pup) ? ( pow((pup.x-dest.x), 2) + pow((pup.y-dest.y), 2) ) : std::numeric_limits<double>::max()};
+    CALC_DIST_T distd {Direction::kDown, is_valid_path(pdn) ? ( pow((pdn.x-dest.x), 2) + pow((pdn.y-dest.y), 2) ) : std::numeric_limits<double>::max()};
+    std::vector<CALC_DIST_T*> vdist { &distr, &distl, &distu, &distd };
+
+    std::sort(vdist.begin(), vdist.end(), comp_funct);
+
+    return (*vdist.begin())->dir;
+}
 
 STRUCT_RET Map::is_background_x_fix_y_var( int x, int y1, int y2, NAME_T name)
 {
@@ -399,31 +411,6 @@ STRUCT_RET Map::is_background(SDL_Point xy1, SDL_Point xy2, NAME_T name) {
     }
     _return = STRUCT_RET{false, SDL_Point{0,0}};
     return _return;
-
-    // if(is_background_x_fix_y_var(xy1.x, xy1.y, xy2.y, name)) 
-    // { 
-    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
-    //     return true; 
-    // }
-    // else if(is_background_x_var_y_fix(xy1.x, xy2.x, xy1.y, name)) 
-    // { 
-    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
-    //     return true; 
-    // }
-    // else if(is_background_x_fix_y_var(xy2.x, xy1.y, xy2.y, name)) 
-    // { 
-    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
-    //     return true; 
-    // }
-    // else if(is_background_x_var_y_fix(xy1.x, xy2.x, xy2.y, name)) 
-    // { 
-    //     //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
-    //     return true; 
-    // }
-    // else 
-    // {
-    //     return false;
-    // }
 };
 
 bool Map::is_background(SDL_Point xy, NAME_T name) {

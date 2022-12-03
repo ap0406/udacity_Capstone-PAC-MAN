@@ -11,26 +11,26 @@
 
 void Controller::HandleInput(bool &running, Pacman_base &pb) const {
   SDL_Event e;
-  pb.direction = Direction::noChange;
+  //pb.direction = Direction::noChange;
   while (SDL_PollEvent(&e)) {
     if (e.type == SDL_QUIT) {
       running = false;
     } else if (e.type == SDL_KEYDOWN) {
       switch (e.key.keysym.sym) {
         case SDLK_UP:
-          pb.direction = Direction::kUp;
+          pb.set_direction(Direction::kUp);
           break;
 
         case SDLK_DOWN:
-          pb.direction = Direction::kDown;
+          pb.set_direction(Direction::kDown);
           break;
 
         case SDLK_LEFT:
-          pb.direction = Direction::kLeft;
+          pb.set_direction(Direction::kLeft);
           break;
 
         case SDLK_RIGHT:
-          pb.direction = Direction::kRight;
+          pb.set_direction(Direction::kRight);
           break;
       }
     }

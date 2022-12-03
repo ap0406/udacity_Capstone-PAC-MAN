@@ -22,7 +22,7 @@ Pacman_base::Pacman_base() {
     name = NAME_T::BACKGROUND;
     size_factor = 1;
     direction = Direction::noChange;
-    prev_direction = Direction::noChange;
+    direction_latch = Direction::noChange;
     // for(uint8_t i = 0; i < kDirectionBufferSize; ++i)
     // {
     //     prev_direction[i] = Direction::noChange; 
@@ -38,7 +38,7 @@ Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Poi
     color = rgb_t;
     size_factor = size_f;
     direction = Direction::noChange;
-    prev_direction = Direction::noChange;
+    direction_latch = Direction::noChange;
     // for(uint8_t i = 0; i < kDirectionBufferSize; ++i)
     // {
     //     prev_direction[i] = Direction::noChange; 
@@ -57,41 +57,24 @@ Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Poi
     
 // }
 
-void Pacman_base::update(Map &map) {
+void Pacman_base::set_direction(Direction dir) {
+    if(dir != Direction::noChange)
+    {
+        direction = dir;
+
+        if(direction_latch == Direction::noChange){
+            direction_latch = direction;
+        }
+    }
+}
+
+STRUCT_RET Pacman_base::check_if_pacman_can_change_direction(Direction dir, Map& map)
+{
+    STRUCT_RET _return {false, SDL_Point{0,0}};
     int update_x;
     int update_y;
-    bool latch_valid_path = false;
-    Direction lcl_dir = Direction::noChange;
 
-    //int last_update;
-    prev_xy = xy;
-    
-    //use of history buffer to smooth out movement
-    // if(direction == Direction::noChange){
-    //     lcl_dir = prev_direction[update_cnt]; //look at the last value in history bufer
-    // }
-    // else {
-    //     lcl_dir = direction;
-    // }
-    if(direction == Direction::noChange)
-    {
-        lcl_dir = prev_direction;
-    }
-    else 
-    {
-        lcl_dir = direction;
-    }
-
-    //lcl_dir = direction;
-
-    // if(lcl_dir != Direction::noChange)
-    // {
-    //     std::cout << "===========================================================================" << std::endl;
-    //     std::cout << lcl_dir << " Start [" << xy.y << "][" << xy.x << "] " << std::endl;
-    // }
-
-
-    switch (lcl_dir) {
+    switch (dir) {
         case Direction::kUp:
             for (int y = int(speed_factor); y > 0; --y)
             {
@@ -99,13 +82,14 @@ void Pacman_base::update(Map &map) {
                 if(map.is_valid_path(SDL_Point{xy.x, update_y}))
                 {
                     // std::cout << "[" << update_y << "][" << xy.x << "] is open"  << std::endl;
-                    xy.y = update_y;
-                    latch_valid_path = true;
+                    _return.result = true;
+                    _return.xy.x = xy.x;
+                    _return.xy.y = update_y;
                     break;
                 }
             }
             //smooth out the control, align with next possible horizontal point
-            if (!latch_valid_path)
+            if (!_return.result)
             {
                 update_y = xy.y - 1; //find the next pixel up
                 for(int x = int(kAlignFactor * speed_factor); x > -int(kAlignFactor * speed_factor); --x)
@@ -114,8 +98,9 @@ void Pacman_base::update(Map &map) {
                     if(map.is_valid_path(SDL_Point{update_x, update_y}))
                     {
                         // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
-                        xy.x = update_x;
-                        xy.y = update_y;
+                        _return.result = true;
+                        _return.xy.x = update_x;
+                        _return.xy.y = update_y;
                         break;
                     }
                 }
@@ -128,14 +113,15 @@ void Pacman_base::update(Map &map) {
                 update_y = xy.y + y;
                 if(map.is_valid_path(SDL_Point{xy.x, update_y}))
                 {
-                    // std::cout << "[" << update_y << "][" << xy.x << "] is open"  << std::endl;
-                    xy.y = update_y;
-                    latch_valid_path = true;
+                    //std::cout << "[" << update_y << "][" << xy.x << "] is open"  << std::endl;
+                    _return.result = true;
+                    _return.xy.x = xy.x;
+                    _return.xy.y = update_y;
                     break;
                 }
             }
             //smooth out the control, align with next possible horizontal point
-            if (!latch_valid_path)
+            if (!_return.result)
             {
                 update_y = xy.y + 1; //find the next pixel down
                 for(int x = int(kAlignFactor * speed_factor); x > -int(kAlignFactor * speed_factor); --x)
@@ -143,9 +129,10 @@ void Pacman_base::update(Map &map) {
                     update_x = xy.x + x;
                     if(map.is_valid_path(SDL_Point{update_x, update_y}))
                     {
-                        // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
-                        xy.x = update_x; 
-                        xy.y = update_y;
+                        //std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
+                        _return.result = true;
+                        _return.xy.x = update_x;
+                        _return.xy.y = update_y;
                         break;
                     }
                 }
@@ -158,12 +145,13 @@ void Pacman_base::update(Map &map) {
                 if(map.is_valid_path(SDL_Point{update_x, xy.y}))
                 {
                     // std::cout << "[" << xy.y << "][" << update_x << "] is open"  << std::endl;
-                    xy.x = update_x;
-                    latch_valid_path = true;
+                    _return.result = true;
+                    _return.xy.x = update_x;
+                    _return.xy.y = xy.y;
                     break;
                 }
             }
-            if (!latch_valid_path)
+            if (!_return.result)
             {
                 update_x = xy.x - 1; //find the next pixel left
                 for(int y = int(kAlignFactor * speed_factor); y > -int(kAlignFactor * speed_factor); --y)
@@ -172,8 +160,9 @@ void Pacman_base::update(Map &map) {
                     if(map.is_valid_path(SDL_Point{update_x, update_y}))
                     {
                         // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
-                        xy.y = update_y; 
-                        xy.x = update_x;
+                        _return.result = true;
+                        _return.xy.x = update_x;
+                        _return.xy.y = update_y;
                         break;
                     }
                 }
@@ -186,12 +175,13 @@ void Pacman_base::update(Map &map) {
                 if(map.is_valid_path(SDL_Point{update_x, xy.y}))
                 {
                     // std::cout << "[" << xy.y << "][" << update_x << "] is open"  << std::endl;
-                    xy.x = update_x;
-                    latch_valid_path = true;
+                    _return.result = true;
+                    _return.xy.x = update_x;
+                    _return.xy.y = xy.y;
                     break;
                 }
             }
-            if (!latch_valid_path)
+            if (!_return.result)
             {
                 update_x = xy.x + 1;
                 for(int y = int(kAlignFactor * speed_factor); y > -int(kAlignFactor * speed_factor); --y)
@@ -200,27 +190,81 @@ void Pacman_base::update(Map &map) {
                     if(map.is_valid_path(SDL_Point{update_x, update_y}))
                     {
                         // std::cout << "[" << update_y << "][" << update_x << "] is open"  << std::endl;
-                        xy.y = update_y;
-                        xy.x = update_x;
+                        _return.result = true;
+                        _return.xy.x = update_x;
+                        _return.xy.y = update_y;
                         break;
                     }
                 }
             }
             break;
     }
-
-    // if(lcl_dir != Direction::noChange)
-    // {
-    //     std::cout << lcl_dir << " End [" << xy.y << "][" << xy.x << "] " << std::endl;
-    // }
-
-    prev_direction = direction;
-    // prev_direction[update_cnt] = direction;
-    // ++update_cnt;
-    // if(update_cnt == kDirectionBufferSize) { update_cnt = 0; }
+    return _return;
 }
 
-// void Pacman_base::update_rand(Map &map, int pos) {
+void Pacman_base::update(Map &map) {
+
+    //int last_update;
+    prev_xy = xy;
+
+    //     std::cout << "===========================================================================" << std::endl;
+    //     std::cout << lcl_dir << " Start [" << xy.y << "][" << xy.x << "] " << std::endl;
+
+    STRUCT_RET result = check_if_pacman_can_change_direction(direction, map);
+
+    if(result.result)
+    {
+        direction_latch = direction;
+        xy = result.xy;
+    }
+    else 
+    {
+
+        result = check_if_pacman_can_change_direction(direction_latch, map);
+        if(result.result)
+        {
+            xy = result.xy;
+        }
+    }
+
+    //     std::cout << lcl_dir << " End [" << xy.y << "][" << xy.x << "] " << std::endl;
+
+}
+
+void Pacman_base::update(Map &map, SDL_Point pacman_xy, GHOST_MODE_T mode) {
+
+    //int last_update;
+    prev_xy = xy;
+
+    //std::cout << "===========================================================================" << std::endl;
+    //std::cout << "Ghost Start " <<  direction_latch << "[" << xy.y << "][" << xy.x << "] " << std::endl;
+
+    STRUCT_RET result = check_if_pacman_can_change_direction(direction_latch, map);
+
+    if(result.result)
+    {
+        //std::cout << "ghost bouncing back: " << direction_latch << "[" << result.xy.y << "][" << result.xy.x << "] " << std::endl;
+        xy = result.xy;
+    }
+    else 
+    {
+        direction_latch = map.calc_shortest_dist(xy, pacman_xy);
+        result = check_if_pacman_can_change_direction(direction_latch, map);
+        if(result.result)
+        {
+            //std::cout << "ghost found shortest dist: " << direction_latch << "[" << result.xy.y << "][" << result.xy.x << "] "<< std::endl;
+            xy = result.xy;
+        }
+        else{
+            std::cout << "Error: " << result.result << " " << direction_latch << std::endl;
+        }
+    }
+
+    //     std::cout << lcl_dir << " End [" << xy.y << "][" << xy.x << "] " << std::endl;
+}
+
+// void Pacman_base::update(Map &map) {
+
 //     prev_xy = xy;
 //     switch (pos) {
 //         case Direction::kUp:

@@ -11,6 +11,7 @@
 
 class Game {
  public:
+  static constexpr int kNumGhosts{4};
   Game();
   // void Run(Controller const &controller, Renderer &renderer,
   //          std::size_t target_frame_duration);
@@ -21,11 +22,8 @@ class Game {
 
  private:
   //Snake snake;
-  //SDL_Point food;
-  std::vector<Pacman_base> food;
-  Pacman_base super_food[4];
   Pacman_base pacman;
-  Pacman_base ghost[4];
+  Pacman_base ghost[kNumGhosts];
 
   std::random_device dev;
   std::mt19937 engine;

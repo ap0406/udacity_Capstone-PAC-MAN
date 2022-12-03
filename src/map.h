@@ -9,12 +9,6 @@
 
 enum GRID_T { block, open, nouse };
 enum FOOD_T { food, superfood, nofood };
-struct STRUCT_RET
-{
-    bool result;
-    SDL_Point xy;
-
-};
 
 class Map {
     public:
@@ -41,6 +35,8 @@ class Map {
         Pacman_base* get_background(int i, int j) { return background[i][j]; }
         Pacman_base* get_moving_objects() { return moving_objects; }
         SDL_Point get_pacman_start_point();
+        SDL_Point get_ghost_start_point(int, int);
+        Direction calc_shortest_dist(SDL_Point, SDL_Point);
 
     private:
         Pacman_base* background[kGridSize][kGridSize];

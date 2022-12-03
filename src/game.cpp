@@ -60,10 +60,12 @@ void Game::Run(Map &map, Controller const &controller, Renderer &renderer, std::
 void Game::InitGame(Map &map) {
     map.place_food_to_moving_objects();
 
-    pacman = Pacman_base(NAME_T::PACMAN, 2, 10, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
+    pacman = Pacman_base(NAME_T::PACMAN, 1, 10, map.get_pacman_start_point(), ALIVE_T::LIVE, Pacman_base::yellow);
     map.set_moving_object(pacman);
 
-    // ghost[0] = Pacman_base(NAME_T::GHOST, 2, 10, map.get_ghost_start_point(0,-1), ALIVE_T::LIVE, Pacman_base::red);
+    ghost[0] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(0,-1), ALIVE_T::LIVE, Pacman_base::red);
+    ghost[0].set_direction(Direction::kUp);
+    map.set_moving_object(ghost[0]);
     // ghost[1] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(0,0), ALIVE_T::LIVE, Pacman_base::cyan);
     // ghost[2] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(1,0), ALIVE_T::LIVE, Pacman_base::orange);
     // ghost[3] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(-1,0), ALIVE_T::LIVE, Pacman_base::pink);
@@ -75,17 +77,17 @@ void Game::SetMovingObjects(Map &map) {
     map.place_food_to_moving_objects();
     map.set_moving_object(pacman);
 
-    // for (int i = 0; i < kNumGhosts; ++i) {
-    //   map.set_moving_object(ghost[i]);
-    // }
+    for (int i = 0; i < kNumGhosts; ++i) {
+      map.set_moving_object(ghost[i]);
+    }
 
 }
 
 void Game::ClearMovingObjects(Map &map) {
 
-    // for (int i = 0; i < kNumGhosts; ++i) {
-    //   map.clear_moving_object(ghost[i].prev_xxy);
-    // }
+    for (int i = 0; i < kNumGhosts; ++i) {
+      map.clear_moving_object(ghost[i].prev_xy);
+    }
 
     map.clear_moving_object(pacman.prev_xy);
 }
@@ -108,10 +110,12 @@ void Game::Update(Map &map) {
     //set attack mode
     pacman_attack_mode = true;
     //change pacman speed to fast
-    pacman.speed_factor = 4;
+    pacman.speed_factor = 2;
     //clear food
     map.clear_food_copy(_return.xy);
   }
+
+  ghost[0].update(map, pacman.xy, GHOST_MODE_T::CHASE);
 
   // ghost[0].update_rand(map, random_dir(engine));
   // //clear ghost from old location

@@ -3,11 +3,20 @@
 
 #include <vector>
 #include "SDL.h"
+#include <random>
 
 struct RGB_T { uint8_t r,g,b; };
 enum ALIVE_T { LIVE, DEAD };
 enum Direction { kUp, kDown, kLeft, kRight, noChange };
 enum NAME_T { FOOD, SUPERFOOD, PACMAN, GHOST, BACKGROUND };
+enum GHOST_MODE_T { CHASE, SCATTER, RUNAWAY };
+
+struct STRUCT_RET
+{
+    bool result;
+    SDL_Point xy;
+
+};
 
 //forward declaration
 class Map;
@@ -37,12 +46,16 @@ class Pacman_base {
         NAME_T name;
         Direction direction;
         //Direction prev_direction[kDirectionBufferSize];
-        Direction prev_direction;
+        Direction direction_latch;
+        void set_direction(Direction);
         Pacman_base();
         Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);
         // bool is_same_cell(SDL_Point);
-        void update(Map &map);
+        void update(Map&);
+        void update(Map&, SDL_Point, GHOST_MODE_T);
         // void update_rand(Map &map, int);
+    private:
+        STRUCT_RET check_if_pacman_can_change_direction(Direction, Map&);
 };
 
 #endif
