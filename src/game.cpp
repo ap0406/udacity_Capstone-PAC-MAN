@@ -64,8 +64,12 @@ void Game::InitGame(Map &map) {
     map.set_moving_object(pacman);
 
     ghost[0] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(0,-1), ALIVE_T::LIVE, Pacman_base::red);
-    ghost[0].set_direction(Direction::kUp);
+    ghost[0].set_direction(Direction::kDown);
     map.set_moving_object(ghost[0]);
+
+    ghost[1] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(2,-1), ALIVE_T::LIVE, Pacman_base::pink);
+    ghost[1].set_direction(Direction::kDown);
+    map.set_moving_object(ghost[1]);
     // ghost[1] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(0,0), ALIVE_T::LIVE, Pacman_base::cyan);
     // ghost[2] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(1,0), ALIVE_T::LIVE, Pacman_base::orange);
     // ghost[3] = Pacman_base(NAME_T::GHOST, 1, 10, map.get_ghost_start_point(-1,0), ALIVE_T::LIVE, Pacman_base::pink);
@@ -116,6 +120,9 @@ void Game::Update(Map &map) {
   }
 
   ghost[0].update(map, pacman.xy, GHOST_MODE_T::CHASE);
+  SDL_Point g1_xy = ghost[1].find_nearest_offset(map, pacman.xy, map.get_screen_to_grid_ratio(), 3*map.get_screen_to_grid_ratio(), pacman.direction_latch);
+  // std::cout << " pacman[y][x] " << pacman.xy.y << " " << pacman.xy.x << " ghost[1][y][x] " << g1_xy.y << " " << g1_xy.x << std::endl;
+  ghost[1].update(map, g1_xy, GHOST_MODE_T::CHASE);
 
   // ghost[0].update_rand(map, random_dir(engine));
   // //clear ghost from old location

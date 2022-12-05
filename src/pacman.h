@@ -53,9 +53,11 @@ class Pacman_base {
         // bool is_same_cell(SDL_Point);
         void update(Map&);
         void update(Map&, SDL_Point, GHOST_MODE_T);
+        SDL_Point find_nearest_offset (Map&, SDL_Point, int, int, Direction);
         // void update_rand(Map &map, int);
     private:
-        STRUCT_RET check_if_pacman_can_change_direction(Direction, Map&);
+        STRUCT_RET check_if_pacman_can_move(SDL_Point, Direction, Map&);
+        STRUCT_RET check_if_pacman_is_near_intersection(SDL_Point, Direction, Map&);
 };
 
 #endif

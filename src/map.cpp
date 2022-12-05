@@ -47,7 +47,7 @@ GRID_T Map::blueprint[kGridSize][kGridSize] =
         { GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block },
         { GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block },
         { GRID_T::nouse, GRID_T::nouse, GRID_T::nouse, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::nouse, GRID_T::nouse, GRID_T::nouse },
-        { GRID_T::nouse, GRID_T::nouse, GRID_T::nouse, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::nouse, GRID_T::nouse, GRID_T::nouse },
+        { GRID_T::nouse, GRID_T::nouse, GRID_T::nouse, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::nouse, GRID_T::nouse, GRID_T::nouse },
         { GRID_T::nouse, GRID_T::nouse, GRID_T::nouse, GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::nouse, GRID_T::nouse, GRID_T::nouse },
         { GRID_T::nouse, GRID_T::nouse, GRID_T::nouse, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::nouse, GRID_T::nouse, GRID_T::nouse },
         { GRID_T::nouse, GRID_T::nouse, GRID_T::nouse, GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::open,  GRID_T::block, GRID_T::open,  GRID_T::block, GRID_T::nouse, GRID_T::nouse, GRID_T::nouse },
@@ -69,9 +69,9 @@ FOOD_T Map::blueprint_food[kGridSize][kGridSize] =
         { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
-        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
-        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
-        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
+        { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::food,      FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
         { FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::food,      FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood,    FOOD_T::nofood   },
@@ -388,25 +388,25 @@ STRUCT_RET Map::is_background(SDL_Point xy1, SDL_Point xy2, NAME_T name) {
     _return = is_background_x_fix_y_var(xy1.x, xy1.y, xy2.y, name);
     if(_return.result)
     {
-        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+        //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = is_background_x_var_y_fix(xy1.x, xy2.x, xy1.y, name);
     if(_return.result)
     {
-        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+        //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = is_background_x_fix_y_var(xy2.x, xy1.y, xy2.y, name);
     if(_return.result)
     {
-        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+        //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = is_background_x_var_y_fix(xy1.x, xy2.x, xy2.y, name);
     if(_return.result)
     {
-        std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
+        //std::cout << "is_background " << name << " found between xy1[x][y] " << xy1.x << " " << xy1.y << " xy2[x][y] " << xy2.x << " " << xy2.y << std::endl;
         return _return;
     }
     _return = STRUCT_RET{false, SDL_Point{0,0}};

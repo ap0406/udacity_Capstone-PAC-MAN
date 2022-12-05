@@ -11,7 +11,7 @@
 
 class Game {
  public:
-  static constexpr int kNumGhosts{4};
+  static constexpr int kNumGhosts{2};
   Game();
   // void Run(Controller const &controller, Renderer &renderer,
   //          std::size_t target_frame_duration);
