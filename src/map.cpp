@@ -145,7 +145,7 @@ void Map::conv_background_to_objects() {
             *background[i][j] = get_background_obj_centered(SDL_Point{j,i});
             //std::cout << "background: " << "[" << i << "]" << "[" << j << "]" << " changed to [" << background[i][j]->xy.y << "]" << "[" << background[i][j]->xy.x << "]" << std::endl;
             if ( blueprint[i][j] == GRID_T::block ) {
-                background[i][j]->color = Pacman_base::blue;
+                background[i][j]->color = Pacman_base::purple;
             }   
         }
     }

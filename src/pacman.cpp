@@ -4,6 +4,7 @@
 #include <iostream>
 
 RGB_T Pacman_base::red {0xcc, 0x00, 0x00};
+RGB_T Pacman_base::purple {0x33, 0x00, 0x66};
 RGB_T Pacman_base::blue {0x00, 0x00, 0xcc};
 RGB_T Pacman_base::green {0x00, 0xcc, 0x00};
 RGB_T Pacman_base::cyan {0x00, 0xcc, 0xcc}; 
@@ -14,7 +15,8 @@ RGB_T Pacman_base::pink {0xcc, 0x00, 0xcc};
 RGB_T Pacman_base::orange {0xcc, 0x66, 0x00};
 uint8_t Pacman_base::update_cnt = 0;
 
-Pacman_base::Pacman_base() {
+Pacman_base::Pacman_base()  
+{
     speed_factor = 0;
     xy = SDL_Point{0,0};
     mode = ALIVE_T::DEAD;
@@ -23,39 +25,39 @@ Pacman_base::Pacman_base() {
     size_factor = 1;
     direction = Direction::noChange;
     direction_latch = Direction::noChange;
-    // for(uint8_t i = 0; i < kDirectionBufferSize; ++i)
-    // {
-    //     prev_direction[i] = Direction::noChange; 
-    // }
 }
 
-Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t) {
+Pacman_base::Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t) 
+{
     name = name_t;
     speed_factor = speed_f;
     xy = ab;
     prev_xy = ab;
     mode = alive_t; 
+    ghost_mode = CHASE;
     color = rgb_t;
+    prev_color = rgb_t;
     size_factor = size_f;
     direction = Direction::noChange;
     direction_latch = Direction::noChange;
-    // for(uint8_t i = 0; i < kDirectionBufferSize; ++i)
-    // {
-    //     prev_direction[i] = Direction::noChange; 
-    // }
+
+    /* initialize random seed: */
+    srand (time(NULL));
 }
 
-// bool Pacman_base::is_same_cell(SDL_Point ab) {
-//     if((ab.x == xy.x) && (ab.y == xy.y)) 
-//     {
-//         return true;
-//     }
-//     else
-//     {
-//         return false;
-//     }
-    
-// }
+bool Pacman_base::is_same_location(Pacman_base *pb) {
+    int x_delta = abs(xy.x-pb->xy.x);
+    int y_delta = abs(xy.y-pb->xy.y);
+    if((x_delta == 0) && ((y_delta < this->size_factor) || (y_delta < pb->size_factor)))
+    {
+        return true;
+    }
+    else if((y_delta == 0) && ((x_delta < this->size_factor) || (x_delta < pb->size_factor)))
+    {
+         return true;
+    }
+    return false;
+}
 
 void Pacman_base::set_direction(Direction dir) {
     if(dir != Direction::noChange)
@@ -121,7 +123,7 @@ STRUCT_RET Pacman_base::check_if_pacman_is_near_intersection(SDL_Point ab, Direc
             {
                 if(y==0) continue; 
                 y_update = ab.y + y;
-                for(int x = 0; x <= -speed_factor; --x)
+                for(int x = 0; x >= -speed_factor; --x)
                 {
                     x_update = ab.x + x;
                     if(map.is_valid_path(SDL_Point{x_update, y_update}))
@@ -134,6 +136,7 @@ STRUCT_RET Pacman_base::check_if_pacman_is_near_intersection(SDL_Point ab, Direc
                     }
                 }
             }
+            break;
         case Direction::kRight:
             for(int y = -1; y <= 1; y++)
             {
@@ -279,6 +282,12 @@ void Pacman_base::update(Map &map) {
 
 SDL_Point Pacman_base::find_nearest_offset(Map &map, SDL_Point ab, int offset_min, int offset_max, Direction dir)
 {
+    //check if the manhuttan distance is less than offset, just goto ab
+    if((abs(xy.x-ab.x)+abs(xy.y-ab.y)) < offset_min )
+    {
+        return ab;
+    }
+
     switch (dir)
     {
         case Direction::kRight:
@@ -339,7 +348,7 @@ SDL_Point Pacman_base::find_nearest_offset(Map &map, SDL_Point ab, int offset_mi
 
 }
 
-void Pacman_base::update(Map &map, SDL_Point pacman_xy, GHOST_MODE_T mode) {
+void Pacman_base::update(Map &map, SDL_Point pacman_xy) {
 
     //int last_update;
     prev_xy = xy;
@@ -402,4 +411,73 @@ void Pacman_base::update(Map &map, SDL_Point pacman_xy, GHOST_MODE_T mode) {
             std::cout << "Error: " << result_move.result << " " << direction_latch << std::endl;
         }
     }
+}
+
+void Pacman_base::rand_update(Map &map) 
+{
+    //int last_update;
+    prev_xy = xy;
+
+    // std::cout << "===========================================================================" << std::endl;
+    // std::cout << "Ghost Start " <<  direction_latch << "[" << xy.y << "][" << xy.x << "] " << std::endl;
+
+    while(direction_latch == noChange)
+    {
+        Direction temp_dir = static_cast<Direction> (rand()%noChange); //(Direction) random_dir(engine);
+
+        STRUCT_RET result_move_init = check_if_pacman_can_move(xy, temp_dir, map);
+        // std::cout << "Ghost move init check " <<  result_move_init.result << "[" << result_move_init.xy.y << "][" << result_move_init.xy.x << "] " << std::endl;
+
+        if(result_move_init.result)
+        {
+            // std::cout << " changing directions from " << direction_latch << " to " << temp_dir << std::endl;
+            direction_latch = temp_dir;
+            xy = result_move_init.xy;
+        }
+        // std::cout << "ghost init direction " << direction_latch << std::endl;
+    }
+
+    STRUCT_RET result_intersect = check_if_pacman_is_near_intersection(xy, direction_latch, map);
+    // std::cout << "Ghost intersection check " <<  result_intersect.result << "[" << result_intersect.xy.y << "][" << result_intersect.xy.x << "] " << std::endl;
+
+    bool intersect_dir_change = false;
+
+    if(result_intersect.result)
+    {
+        while(!intersect_dir_change)
+        {
+            Direction temp_dir = static_cast<Direction> (rand()%noChange);
+
+            if((direction_latch == Direction::kDown) && (temp_dir == Direction::kUp)) { continue; }
+            if((direction_latch == Direction::kUp) && (temp_dir == Direction::kDown)) { continue; }
+            if((direction_latch == Direction::kLeft) && (temp_dir == Direction::kRight)) { continue; }
+            if((direction_latch == Direction::kRight) && (temp_dir == Direction::kLeft)) { continue; }
+
+            STRUCT_RET result_move = check_if_pacman_can_move(result_intersect.xy, temp_dir, map);
+            // std::cout << "Ghost move check " <<  result_move.result << "[" << result_move.xy.y << "][" << result_move.xy.x << "] " << std::endl;
+
+            if(result_move.result)
+            {
+                // std::cout << " changing directions from " << direction_latch << " to " << temp_dir << std::endl;
+                direction_latch = temp_dir;
+                xy = result_move.xy;
+                intersect_dir_change = true;
+            }
+            // std::cout << "ghost rand direction " << temp_dir << std::endl;
+        }
+    }
+
+    STRUCT_RET result_move2 = check_if_pacman_can_move(xy, direction_latch, map);
+    // std::cout << "Ghost move2 check " <<  result_move2.result << "[" << result_move2.xy.y << "][" << result_move2.xy.x << "] " << std::endl;
+
+    if(result_move2.result && !intersect_dir_change)
+    {
+        xy = result_move2.xy;
+    }
+    else if (!intersect_dir_change)
+    {
+        std::cout << "Error: " << result_move2.result << " " << direction_latch << std::endl;
+    }
+    // std::cout << "leaving with [" << xy.y << "][" << xy.x << "] " << std::endl;
+
 }

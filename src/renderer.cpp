@@ -37,44 +37,7 @@ Renderer::~Renderer() {
   SDL_DestroyWindow(sdl_window);
   SDL_Quit();
 }
-/*
-void Renderer::Render(Snake const snake, SDL_Point const &food) {
-  SDL_Rect block;
-  block.w = screen_width / grid_width;
-  block.h = screen_height / grid_height;
 
-  // Clear screen
-  SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
-  SDL_RenderClear(sdl_renderer);
-
-  // Render food
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-  block.x = food.x * block.w;
-  block.y = food.y * block.h;
-  SDL_RenderFillRect(sdl_renderer, &block);
-
-  // Render snake's body
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-  for (SDL_Point const &point : snake.body) {
-    block.x = point.x * block.w;
-    block.y = point.y * block.h;
-    SDL_RenderFillRect(sdl_renderer, &block);
-  }
-
-  // Render snake's head
-  block.x = static_cast<int>(snake.head_x) * block.w;
-  block.y = static_cast<int>(snake.head_y) * block.h;
-  if (snake.alive) {
-    SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
-  } else {
-    SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
-  }
-  SDL_RenderFillRect(sdl_renderer, &block);
-
-  // Update Screen
-  SDL_RenderPresent(sdl_renderer);
-}
-*/
 void Renderer::Render(Map &map) {
 
   // Clear screen
@@ -82,9 +45,6 @@ void Renderer::Render(Map &map) {
   SDL_RenderClear(sdl_renderer);
 
   // Render background
-  // Pacman_base* background = map.get_background();
-  // Pacman_base* start = background;
-  // Pacman_base* end = start+2; //*sizeof(Pacman_base));
   for (int i=0; i<grid_height; ++i) {
       for (int j=0; j<grid_width; ++j) {
           Pacman_base* pb = map.get_background(i,j);
@@ -98,6 +58,7 @@ void Renderer::Render(Map &map) {
           SDL_RenderFillRect(sdl_renderer, &rect);
       }
   }
+  // Render moving objects
   for (int i = 0; i < int(screen_height); ++i) {
       for(int j = 0; j < int(screen_width); ++j) {
           Pacman_base* pb = map.get_moving_objects() + ( i * screen_height ) + j;
@@ -110,6 +71,7 @@ void Renderer::Render(Map &map) {
       }
   }
 
+  // Render open path
   // for (int i = 0; i < screen_height; ++i){
   //     for (int j = 0; j < screen_height; ++j){
   //         bool* add_offset = map.get_open_path() + ( i * screen_height ) + j;

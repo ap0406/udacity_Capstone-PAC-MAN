@@ -9,7 +9,7 @@ struct RGB_T { uint8_t r,g,b; };
 enum ALIVE_T { LIVE, DEAD };
 enum Direction { kUp, kDown, kLeft, kRight, noChange };
 enum NAME_T { FOOD, SUPERFOOD, PACMAN, GHOST, BACKGROUND };
-enum GHOST_MODE_T { CHASE, SCATTER, RUNAWAY };
+enum GHOST_MODE_T { CHASE, RUNAWAY };
 
 struct STRUCT_RET
 {
@@ -25,6 +25,7 @@ class Pacman_base {
     public:
 
         static RGB_T red;
+        static RGB_T purple;
         static RGB_T blue;
         static RGB_T green;
         static RGB_T cyan;
@@ -42,6 +43,7 @@ class Pacman_base {
         SDL_Point xy;
         SDL_Point prev_xy; 
         ALIVE_T mode;
+        GHOST_MODE_T ghost_mode;
         RGB_T color;
         NAME_T name;
         Direction direction;
@@ -50,14 +52,19 @@ class Pacman_base {
         void set_direction(Direction);
         Pacman_base();
         Pacman_base(NAME_T name_t, uint8_t speed_f, uint8_t size_f, SDL_Point ab, ALIVE_T alive_t, RGB_T rgb_t);
-        // bool is_same_cell(SDL_Point);
+        bool is_same_location(Pacman_base*);
         void update(Map&);
-        void update(Map&, SDL_Point, GHOST_MODE_T);
+        void update(Map&, SDL_Point);
+        void rand_update(Map&);
         SDL_Point find_nearest_offset (Map&, SDL_Point, int, int, Direction);
-        // void update_rand(Map &map, int);
+        void set_new_color(RGB_T rgb) { prev_color = color; color = rgb; }
+        void set_prev_color() { color = prev_color; }
+        
     private:
         STRUCT_RET check_if_pacman_can_move(SDL_Point, Direction, Map&);
         STRUCT_RET check_if_pacman_is_near_intersection(SDL_Point, Direction, Map&);
+        RGB_T prev_color;
+        
 };
 
 #endif

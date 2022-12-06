@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <random>
+//#include <random>
 #include "SDL.h"
 #include "controller.h"
 #include "renderer.h"
@@ -11,7 +11,8 @@
 
 class Game {
  public:
-  static constexpr int kNumGhosts{2};
+  static constexpr int kNumGhosts{6};
+  static constexpr std::size_t PacmanAttackTimePeriod{10000};
   Game();
   // void Run(Controller const &controller, Renderer &renderer,
   //          std::size_t target_frame_duration);
@@ -25,13 +26,10 @@ class Game {
   Pacman_base pacman;
   Pacman_base ghost[kNumGhosts];
 
-  std::random_device dev;
-  std::mt19937 engine;
-  std::uniform_int_distribution<int> random_w;
-  std::uniform_int_distribution<int> random_h;
-  std::uniform_int_distribution<int> random_dir;
-
   bool pacman_attack_mode;
+  bool game_over;
+  uint32_t attacktimestart;
+  uint32_t attacktimeend;
 
   int score{0};
 
@@ -39,6 +37,10 @@ class Game {
   void Update(Map &map);
   void SetMovingObjects(Map &map);
   void ClearMovingObjects(Map &map);
+  void attackmodeon();
+  void attackmodeoff();
+  void ghost_init(Map&, uint8_t);
+  void ghost_update(Map&, uint8_t);
 };
 
 #endif
